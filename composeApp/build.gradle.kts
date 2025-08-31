@@ -9,7 +9,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
 }
 
 java {
@@ -69,6 +68,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.android)
+            implementation(libs.sql.delight.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -79,13 +80,37 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.serialization)
+
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.core)
+
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
+            implementation(libs.coil)
+            implementation(libs.coil.ktor)
+
+            implementation(libs.sql.delight.common)
+            api(libs.sql.delight.common.coroutines)
+
+            implementation(libs.navigation.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+
+            implementation(libs.ktor.client.desktop)
+            implementation(libs.sql.delight.desktop)
+        }
+        iosMain.dependencies {
+            implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.ktor.client.ios)
+            implementation(libs.sql.delight.ios)
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 }
