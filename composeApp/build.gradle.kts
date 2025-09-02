@@ -105,7 +105,6 @@ kotlin {
             implementation(libs.sql.delight.desktop)
         }
         iosMain.dependencies {
-            implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.ktor.client.ios)
             implementation(libs.sql.delight.ios)
         }
