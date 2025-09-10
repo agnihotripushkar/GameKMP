@@ -1,11 +1,11 @@
-package com.devpush.features.game.data.mappers
+package com.devpush.features.gameDetails.data.mappers
 
 import com.devpush.coreNetwork.model.gameDetails.GameDetailsResponse
-import com.devpush.features.game.domain.model.Developer
-import com.devpush.features.game.domain.model.GameDetails
-import com.devpush.features.game.domain.model.Platform
-import com.devpush.features.game.domain.model.Store
-import com.devpush.features.game.domain.model.Tag
+import com.devpush.features.gameDetails.domain.model.Developer
+import com.devpush.features.gameDetails.domain.model.GameDetails
+import com.devpush.features.gameDetails.domain.model.Platform
+import com.devpush.features.gameDetails.domain.model.Store
+import com.devpush.features.gameDetails.domain.model.Tag
 
 fun GameDetailsResponse.toDomainGameDetails(): GameDetails {
     return GameDetails(

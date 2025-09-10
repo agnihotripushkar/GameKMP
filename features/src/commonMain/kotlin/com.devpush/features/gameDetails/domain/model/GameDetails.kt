@@ -1,4 +1,4 @@
-package com.devpush.features.game.domain.model
+package com.devpush.features.gameDetails.domain.model
 
 data class GameDetails(
     val name: String,
