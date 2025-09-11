@@ -5,10 +5,11 @@ import com.devpush.coreDatabase.SqlDriverFactory
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import com.devpush.coreDatabase.AppDatabase
+import android.content.Context
 
 actual fun getCoreDatabaseModule(): Module {
     return module {
-        single { SqlDriverFactory().getSqlDriver() }
+        single { SqlDriverFactory(get<Context>()).getSqlDriver() }
         single { AppDatabase.invoke(get<SqlDriver>()) }
 
     }

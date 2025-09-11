@@ -34,64 +34,55 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies{
+            implementation(projects.coreNetwork)
+            implementation(projects.coreDatabase)
 
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
-                implementation(compose.ui)
-                implementation(compose.components.resources)
-                implementation(compose.components.uiToolingPreview)
-                implementation(libs.androidx.lifecycle.viewmodel)
-                implementation(libs.androidx.lifecycle.runtime.compose)
-                implementation(libs.kotlinx.serialization)
-                // Add KMP dependencies here
-                implementation(libs.sql.delight.common)
-                api(libs.sql.delight.common.coroutines)
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(compose.components.resources)
+            implementation(compose.components.uiToolingPreview)
+            implementation(libs.androidx.lifecycle.viewmodel)
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.kotlinx.serialization)
+            // Add KMP dependencies here
 
-                implementation(libs.koin.compose.viewmodel)
-                implementation(libs.koin.core)
-            }
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.core)
+
+            implementation(libs.coil)
+            implementation(libs.coil.ktor)
+
+        }
 
         androidMain {
             dependencies {
                 // Add Android-specific dependencies here. Note that this source set depends on
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
-                implementation(libs.sql.delight.android)
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
             }
         }
 
         iosMain.dependencies{
-                // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
-                // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
-                // part of KMP’s default source set hierarchy. Note that this source set depends
-                // on common by default and will correctly pull the iOS artifacts of any
-                // KMP dependencies declared in commonMain.
-                implementation(libs.sql.delight.ios)
+            // Add iOS-specific dependencies here. This a source set created by Kotlin Gradle
+            // Plugin (KGP) that each specific iOS target (e.g., iosX64) depends on as
+            // part of KMP’s default source set hierarchy. Note that this source set depends
+            // on common by default and will correctly pull the iOS artifacts of any
+            // KMP dependencies declared in commonMain.
 
         }
 
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.sql.delight.desktop)
         }
     }
-}
-
-sqldelight{
-    databases{
-        create("AppDatabase"){
-            packageName = "com.devpush.coreDatabase"
-            srcDirs("src/commonMain/sqldelight")
-        }
-    }
-    linkSqlite = true
 }
 
 android {
-    namespace = "com.devpush.coreDatabase"
+    namespace = "com.devpush.features"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
@@ -123,7 +114,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.devpush.coreDatabase"
+            packageName = "com.devpush.features"
             packageVersion = "1.0.0"
         }
     }
