@@ -25,12 +25,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.icons.Icons
-import androidx.compose.material3.icons.filled.ArrowBack
-import androidx.compose.material3.icons.filled.Delete
-import androidx.compose.material3.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -310,10 +307,11 @@ fun GameDetailsScreenContent(
                     onClick = onBackClick,
                     modifier = Modifier.background(color = Color.White, shape = CircleShape)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack, contentDescription = null,
-                        modifier = Modifier.padding(4.dp)
-                    )
+//                    Icon(
+//                        imageVector = Icons.Default.ArrowBack,
+//                        contentDescription = null,
+//                        modifier = Modifier.padding(4.dp)
+//                    )
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -324,10 +322,10 @@ fun GameDetailsScreenContent(
                     },
                     modifier = Modifier.background(color = Color.White, shape = CircleShape)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite, contentDescription = null,
-                        modifier = Modifier.padding(4.dp)
-                    )
+//                    Icon(
+//                        imageVector = Icons.Default.Favorite, contentDescription = null,
+//                        modifier = Modifier.padding(4.dp)
+//                    )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -339,10 +337,10 @@ fun GameDetailsScreenContent(
                     },
                     modifier = Modifier.background(color = Color.White, shape = CircleShape)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete, contentDescription = null,
-                        modifier = Modifier.padding(4.dp)
-                    )
+//                    Icon(
+//                        imageVector = Icons.Default.Delete, contentDescription = null,
+//                        modifier = Modifier.padding(4.dp)
+//                    )
                 }
 
             }

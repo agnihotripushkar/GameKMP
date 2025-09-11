@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.devpush.features.game.ui.GameScreen
+import com.devpush.features.gameDetails.ui.GameDetailsScreen
 
 object GameNavGraph: BaseNavGraph {
 
@@ -36,6 +37,14 @@ object GameNavGraph: BaseNavGraph {
                     })
             }
 
+            composable(route = Dest.Details.route) {
+                val id = it.arguments?.getString("id")
+                GameDetailsScreen(modifier = modifier.fillMaxSize(), id.toString(), onBackClick = {
+                    navHostController.popBackStack()
+                })
+            }
+
         }
+
     }
 }
