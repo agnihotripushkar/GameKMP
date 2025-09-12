@@ -6,21 +6,24 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import com.devpush.features.game.ui.GameScreen
 import com.devpush.features.gameDetails.ui.GameDetailsScreen
+import kotlinx.serialization.Serializable
 
-object GameNavGraph: BaseNavGraph {
+object GameNavGraph : BaseNavGraph {
 
-    sealed class Dest(val route: String) {
+    @Serializable
+    sealed class Dest {
 
-        data object Root : Dest("/game-root")
+        @Serializable
+        data object Root : Dest()
 
-        data object Game : Dest("/game")
+        @Serializable
+        data object Game : Dest()
 
-        data object Details : Dest("/game_details/{id}") {
-            fun getRoute(id: Int) = "/game_details/${id}"
-        }
-
+        @Serializable
+        data class Details(val id: Int) : Dest()
     }
 
     override fun build(
@@ -28,23 +31,24 @@ object GameNavGraph: BaseNavGraph {
         navHostController: NavHostController,
         navGraphBuilder: NavGraphBuilder
     ) {
-        navGraphBuilder.navigation(route = Dest.Root.route, startDestination = Dest.Game.route) {
-            composable(route = Dest.Game.route) {
+        navGraphBuilder.navigation<Dest.Root>(startDestination = Dest.Game) {
+            composable<Dest.Game> {
                 GameScreen(
                     modifier = modifier.fillMaxSize(),
-                     onClick = {
-                        navHostController.navigate(Dest.Details.getRoute(it))
+                    onClick = {
+                        navHostController.navigate(Dest.Details(it))
                     })
             }
 
-            composable(route = Dest.Details.route) {
-                val id = it.arguments?.getString("id")
-                GameDetailsScreen(modifier = modifier.fillMaxSize(), id.toString(), onBackClick = {
-                    navHostController.popBackStack()
-                })
+            composable<Dest.Details> {
+                val args = it.toRoute<Dest.Details>()
+                GameDetailsScreen(
+                    modifier = modifier.fillMaxSize(),
+                    id = args.id.toString(),
+                    onBackClick = {
+                        navHostController.popBackStack()
+                    })
             }
-
         }
-
     }
 }
