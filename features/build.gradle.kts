@@ -28,10 +28,10 @@ kotlin {
         }
     }
 
-    jvm("desktop")
+//    jvm("desktop")
 
     sourceSets {
-        val desktopMain by getting
+//        val desktopMain by getting
 
         commonMain.dependencies{
             implementation(projects.coreNetwork)
@@ -75,9 +75,9 @@ kotlin {
 
         }
 
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-        }
+//        desktopMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//        }
     }
 }
 
@@ -109,13 +109,13 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
-compose.desktop {
-    application {
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.devpush.features"
-            packageVersion = "1.0.0"
-        }
-    }
-}
+//compose.desktop {
+//    application {
+//
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//            packageName = "com.devpush.features"
+//            packageVersion = "1.0.0"
+//        }
+//    }
+//}

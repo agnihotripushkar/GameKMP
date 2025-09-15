@@ -29,10 +29,10 @@ kotlin {
         }
     }
 
-    jvm("desktop")
+//    jvm("desktop")
 
     sourceSets {
-        val desktopMain by getting
+//        val desktopMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
@@ -61,12 +61,12 @@ kotlin {
 
 
         }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
-
-            implementation(libs.ktor.client.desktop)
-        }
+//        desktopMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//            implementation(libs.kotlinx.coroutines.swing)
+//
+//            implementation(libs.ktor.client.desktop)
+//        }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
@@ -102,13 +102,13 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
-compose.desktop {
-    application {
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.devpush.coreNetwork"
-            packageVersion = "1.0.0"
-        }
-    }
-}
+//compose.desktop {
+//    application {
+//
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//            packageName = "com.devpush.coreNetwork"
+//            packageVersion = "1.0.0"
+//        }
+//    }
+//}

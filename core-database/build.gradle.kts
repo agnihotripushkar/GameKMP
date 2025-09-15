@@ -28,10 +28,10 @@ kotlin {
         }
     }
 
-    jvm("desktop")
+//    jvm("desktop")
 
     sourceSets {
-        val desktopMain by getting
+//        val desktopMain by getting
 
         commonMain.dependencies{
 
@@ -73,10 +73,10 @@ kotlin {
 
         }
 
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.sql.delight.desktop)
-        }
+//        desktopMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//            implementation(libs.sql.delight.desktop)
+//        }
     }
 }
 
@@ -118,13 +118,13 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
-compose.desktop {
-    application {
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.devpush.coreDatabase"
-            packageVersion = "1.0.0"
-        }
-    }
-}
+//compose.desktop {
+//    application {
+//
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//            packageName = "com.devpush.coreDatabase"
+//            packageVersion = "1.0.0"
+//        }
+//    }
+//}
