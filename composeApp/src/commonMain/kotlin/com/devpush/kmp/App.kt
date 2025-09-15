@@ -25,17 +25,18 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kmp.composeapp.generated.resources.Res
 import kmp.composeapp.generated.resources.compose_multiplatform
 
+import androidx.navigation.createGraph
+
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
         val navHostController = rememberNavController()
         val bottomPadding = WindowInsets.statusBars.asPaddingValues().calculateBottomPadding()
-        NavHost(navHostController, startDestination = GameNavGraph.Dest.Root.route) {
-            listOf(
-                GameNavGraph
-            ).forEach {
-                it.build(
+
+        val navGraph = remember(navHostController) {
+            navHostController.createGraph(startDestination = GameNavGraph.Dest.Root) {
+                GameNavGraph.build(
                     modifier = Modifier.padding(top = bottomPadding).fillMaxSize(),
                     navHostController = navHostController,
                     navGraphBuilder = this
@@ -43,5 +44,10 @@ fun App() {
             }
         }
 
+        NavHost(
+            navController = navHostController,
+            graph = navGraph,
+            modifier = Modifier.padding(top = bottomPadding).fillMaxSize()
+        )
     }
 }

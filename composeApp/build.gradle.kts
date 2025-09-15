@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 java {
@@ -38,7 +39,7 @@ kotlin {
         }
     }
     
-    jvm("desktop")
+//    jvm("desktop")
     
 //    @OptIn(ExperimentalWasmDsl::class)
 //    wasmJs {
@@ -61,7 +62,7 @@ kotlin {
 //    }
     
     sourceSets {
-        val desktopMain by getting
+//        val desktopMain by getting
         
         androidMain.dependencies {
             implementation(compose.preview)
@@ -99,13 +100,7 @@ kotlin {
 
             implementation(libs.navigation.compose)
         }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
 
-            implementation(libs.ktor.client.desktop)
-            implementation(libs.sql.delight.desktop)
-        }
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
             implementation(libs.sql.delight.ios)
@@ -113,6 +108,13 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        //        desktopMain.dependencies {
+//            implementation(compose.desktop.currentOs)
+//            implementation(libs.kotlinx.coroutines.swing)
+//
+//            implementation(libs.ktor.client.desktop)
+//            implementation(libs.sql.delight.desktop)
+//        }
     }
 }
 
@@ -147,14 +149,14 @@ dependencies {
     debugImplementation(compose.uiTooling)
 }
 
-compose.desktop {
-    application {
-        mainClass = "com.devpush.kmp.MainKt"
-
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.devpush.kmp"
-            packageVersion = "1.0.0"
-        }
-    }
-}
+//compose.desktop {
+//    application {
+//        mainClass = "com.devpush.kmp.MainKt"
+//
+//        nativeDistributions {
+//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+//            packageName = "com.devpush.kmp"
+//            packageVersion = "1.0.0"
+//        }
+//    }
+//}
