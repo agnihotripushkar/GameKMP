@@ -22,6 +22,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +43,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import kmp.features.generated.resources.Res
+import kmp.features.generated.resources.developers
+import kmp.features.generated.resources.game_count
+import kmp.features.generated.resources.platforms
+import kmp.features.generated.resources.stores
+import kmp.features.generated.resources.tags
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -115,7 +126,8 @@ fun GameDetailsScreenContent(
                     Column(modifier = Modifier.fillMaxWidth()) {
 
                         Text(
-                            text = "Platforms", style = MaterialTheme.typography.headlineSmall, // M3: Was h4
+                            text = stringResource(Res.string.platforms),
+                            style = MaterialTheme.typography.headlineSmall, // M3: Was h4
                             modifier = Modifier.padding(horizontal = 12.dp).padding(top = 24.dp)
                         )
 
@@ -160,7 +172,8 @@ fun GameDetailsScreenContent(
 
                 item {
                     Text(
-                        text = "Stores", style = MaterialTheme.typography.headlineSmall, // M3: Was h4
+                        text = stringResource(Res.string.stores),
+                        style = MaterialTheme.typography.headlineSmall, // M3: Was h4
                         modifier = Modifier.padding(horizontal = 12.dp).padding(top = 24.dp)
                             .padding(bottom = 12.dp)
                     )
@@ -196,7 +209,7 @@ fun GameDetailsScreenContent(
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Gamecount: " + it.gameCount,
+                                text = stringResource(Res.string.game_count, it.gameCount),
                                 style = MaterialTheme.typography.bodySmall // M3: Was caption
                             )
 
@@ -208,7 +221,8 @@ fun GameDetailsScreenContent(
 
                 item {
                     Text(
-                        text = "Tags", style = MaterialTheme.typography.headlineSmall, // M3: Was h4
+                        text = stringResource(Res.string.tags),
+                        style = MaterialTheme.typography.headlineSmall, // M3: Was h4
                         modifier = Modifier.padding(horizontal = 12.dp).padding(top = 24.dp)
                     )
                 }
@@ -253,7 +267,8 @@ fun GameDetailsScreenContent(
 
                 item {
                     Text(
-                        text = "Developers", style = MaterialTheme.typography.headlineSmall, // M3: Was h4
+                        text = stringResource(Res.string.developers),
+                        style = MaterialTheme.typography.headlineSmall, // M3: Was h4
                         modifier = Modifier.padding(horizontal = 12.dp)
                             .padding(top = 24.dp, bottom = 12.dp)
                     )
@@ -285,7 +300,7 @@ fun GameDetailsScreenContent(
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "Gamecount: " + it.gameCount,
+                                text = stringResource(Res.string.game_count, it.gameCount),
                                 style = MaterialTheme.typography.bodySmall // M3: Was caption
                             )
                         }
@@ -307,11 +322,11 @@ fun GameDetailsScreenContent(
                     onClick = onBackClick,
                     modifier = Modifier.background(color = Color.White, shape = CircleShape)
                 ) {
-//                    Icon(
-//                        imageVector = Icons.Default.ArrowBack,
-//                        contentDescription = null,
-//                        modifier = Modifier.padding(4.dp)
-//                    )
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier.padding(4.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -322,10 +337,10 @@ fun GameDetailsScreenContent(
                     },
                     modifier = Modifier.background(color = Color.White, shape = CircleShape)
                 ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Favorite, contentDescription = null,
-//                        modifier = Modifier.padding(4.dp)
-//                    )
+                    Icon(
+                        imageVector = Icons.Default.Favorite, contentDescription = null,
+                        modifier = Modifier.padding(4.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -337,10 +352,10 @@ fun GameDetailsScreenContent(
                     },
                     modifier = Modifier.background(color = Color.White, shape = CircleShape)
                 ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Delete, contentDescription = null,
-//                        modifier = Modifier.padding(4.dp)
-//                    )
+                    Icon(
+                        imageVector = Icons.Default.Delete, contentDescription = null,
+                        modifier = Modifier.padding(4.dp)
+                    )
                 }
 
             }

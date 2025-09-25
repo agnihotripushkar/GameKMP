@@ -41,7 +41,7 @@ class GameViewModel(
                 result.onSuccess { data ->
                     _uiState.update { GameUiState(games = data) }
                 }.onFailure { error ->
-                    _uiState.update { GameUiState(error = error.message.toString()) }
+                    _uiState.update { GameUiState(error = null) }
                 }
             }
             .launchIn(viewModelScope)

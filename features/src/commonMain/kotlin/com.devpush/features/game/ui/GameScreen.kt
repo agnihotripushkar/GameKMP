@@ -20,6 +20,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import kmp.features.generated.resources.Res
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.devpush.features.game.domain.model.Game
+import kmp.features.generated.resources.games
+import kmp.features.generated.resources.something_went_wrong
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +48,7 @@ fun GameScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text(text = "Games") },
+                title = { Text(text = stringResource(Res.string.games)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer, // Or Color.White if you prefer
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -67,7 +71,16 @@ fun GameScreen(
             ) {
                 Text(uiState.value.error!!, color = MaterialTheme.colorScheme.error)
             }
-        } else {
+        }
+        else if (uiState.value.error.isNullOrBlank() && uiState.value.games.isEmpty()){
+            Box(
+                Modifier.fillMaxSize().padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(stringResource(Res.string.something_went_wrong), color = MaterialTheme.colorScheme.error)
+            }
+        }
+        else {
             uiState.value.games.let { data ->
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
