@@ -5,6 +5,7 @@ import ComposeApp
 struct iOSApp: App {
 
     init(){
+        NapierSetupKt.setupNapier()
         AppDiSetupKt.intiKoin()
     }
 

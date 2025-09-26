@@ -23,6 +23,7 @@ material3 = "1.3.2"
 lifecycleViewmodelCompose = "2.9.1"
 navigation-compose = "2.9.0-beta05"
 coil3 = "3.1.0"
+napier = "2.7.1"
 
 
 [libraries]
@@ -65,7 +66,7 @@ sql-delight-android = { module = "app.cash.sqldelight:android-driver", version.r
 sql-delight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sql-delight-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 
-
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
