@@ -99,6 +99,8 @@ kotlin {
             api(libs.sql.delight.common.coroutines)
 
             implementation(libs.navigation.compose)
+
+            implementation(libs.napier)
         }
 
         iosMain.dependencies {
