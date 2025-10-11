@@ -5,5 +5,12 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 fun getGameViewModelModule() = module {
-    viewModel { GameViewModel(get()) }
+    viewModel { 
+        GameViewModel(
+            gameRepository = get(),
+            searchGamesUseCase = get(),
+            filterGamesUseCase = get(),
+            getAvailableFiltersUseCase = get()
+        ) 
+    }
 }

@@ -1,15 +1,156 @@
+-- Enhanced game table
 CREATE TABLE game(
-id INTEGER NOT NULL PRIMARY KEY,
-image TEXT NOT NULL,
-name TEXT NOT NULL
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    image TEXT NOT NULL,
+    rating REAL NOT NULL DEFAULT 0.0,
+    release_date TEXT
 );
 
+-- Platform table
+CREATE TABLE platform(
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE
+);
+
+-- Genre table
+CREATE TABLE genre(
+    id INTEGER NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE
+);
+
+-- Game-Platform relationship
+CREATE TABLE game_platform(
+    game_id INTEGER NOT NULL,
+    platform_id INTEGER NOT NULL,
+    PRIMARY KEY (game_id, platform_id),
+    FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE,
+    FOREIGN KEY (platform_id) REFERENCES platform(id) ON DELETE CASCADE
+);
+
+-- Game-Genre relationship
+CREATE TABLE game_genre(
+    game_id INTEGER NOT NULL,
+    genre_id INTEGER NOT NULL,
+    PRIMARY KEY (game_id, genre_id),
+    FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE,
+    FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE CASCADE
+);
+
+-- Game operations
 upsert:
-INSERT OR REPLACE INTO game(id,image,name) VALUES(?,?,?);
+INSERT OR REPLACE INTO game(id, name, image, rating, release_date) VALUES(?, ?, ?, ?, ?);
 
 getAllGames:
 SELECT * FROM game;
 
 delete:
 DELETE FROM game WHERE id=?;
+
+-- Platform operations
+upsertPlatform:
+INSERT OR REPLACE INTO platform(id, name, slug) VALUES(?, ?, ?);
+
+getAllPlatforms:
+SELECT * FROM platform;
+
+-- Genre operations
+upsertGenre:
+INSERT OR REPLACE INTO genre(id, name, slug) VALUES(?, ?, ?);
+
+getAllGenres:
+SELECT * FROM genre;
+
+-- Game-Platform relationship operations
+insertGamePlatform:
+INSERT OR REPLACE INTO game_platform(game_id, platform_id) VALUES(?, ?);
+
+deleteGamePlatforms:
+DELETE FROM game_platform WHERE game_id = ?;
+
+getGamePlatforms:
+SELECT p.* FROM platform p
+INNER JOIN game_platform gp ON p.id = gp.platform_id
+WHERE gp.game_id = ?;
+
+-- Game-Genre relationship operations
+insertGameGenre:
+INSERT OR REPLACE INTO game_genre(game_id, genre_id) VALUES(?, ?);
+
+deleteGameGenres:
+DELETE FROM game_genre WHERE game_id = ?;
+
+getGameGenres:
+SELECT g.* FROM genre g
+INNER JOIN game_genre gg ON g.id = gg.genre_id
+WHERE gg.game_id = ?;
+
+-- Filtered game queries
+getGamesByPlatform:
+SELECT DISTINCT g.* FROM game g
+INNER JOIN game_platform gp ON g.id = gp.game_id
+WHERE gp.platform_id IN ?;
+
+getGamesByGenre:
+SELECT DISTINCT g.* FROM game g
+INNER JOIN game_genre gg ON g.id = gg.game_id
+WHERE gg.genre_id IN ?;
+
+getGamesByRating:
+SELECT * FROM game WHERE rating >= ?;
+
+searchGamesByName:
+SELECT * FROM game WHERE name LIKE '%' || ? || '%';
+
+-- Performance optimization: Add indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_game_name ON game(name);
+CREATE INDEX IF NOT EXISTS idx_game_rating ON game(rating);
+CREATE INDEX IF NOT EXISTS idx_game_release_date ON game(release_date);
+CREATE INDEX IF NOT EXISTS idx_platform_name ON platform(name);
+CREATE INDEX IF NOT EXISTS idx_genre_name ON genre(name);
+CREATE INDEX IF NOT EXISTS idx_game_platform_game_id ON game_platform(game_id);
+CREATE INDEX IF NOT EXISTS idx_game_platform_platform_id ON game_platform(platform_id);
+CREATE INDEX IF NOT EXISTS idx_game_genre_game_id ON game_genre(game_id);
+CREATE INDEX IF NOT EXISTS idx_game_genre_genre_id ON game_genre(genre_id);
+
+-- Optimized queries for better performance
+getGamesByPlatformOptimized:
+SELECT DISTINCT g.* FROM game g
+INNER JOIN game_platform gp ON g.id = gp.game_id
+WHERE gp.platform_id IN ?
+ORDER BY g.rating DESC, g.name ASC;
+
+getGamesByGenreOptimized:
+SELECT DISTINCT g.* FROM game g
+INNER JOIN game_genre gg ON g.id = gg.game_id
+WHERE gg.genre_id IN ?
+ORDER BY g.rating DESC, g.name ASC;
+
+getGamesByRatingOptimized:
+SELECT * FROM game 
+WHERE rating >= ? 
+ORDER BY rating DESC, name ASC;
+
+searchGamesByNameOptimized:
+SELECT * FROM game 
+WHERE name LIKE '%' || ? || '%' 
+ORDER BY 
+  CASE WHEN name LIKE ? || '%' THEN 1 ELSE 2 END,
+  rating DESC, 
+  name ASC;
+
+-- Combined filter queries for better performance
+getGamesWithFilters:
+SELECT DISTINCT g.* FROM game g
+LEFT JOIN game_platform gp ON g.id = gp.game_id
+LEFT JOIN game_genre gg ON g.id = gg.game_id
+WHERE 
+  (? = '' OR g.name LIKE '%' || ? || '%') AND
+  (? = 0 OR g.rating >= ?) AND
+  (? = 0 OR gp.platform_id IN ?) AND
+  (? = 0 OR gg.genre_id IN ?)
+ORDER BY g.rating DESC, g.name ASC
+LIMIT ? OFFSET ?;
 

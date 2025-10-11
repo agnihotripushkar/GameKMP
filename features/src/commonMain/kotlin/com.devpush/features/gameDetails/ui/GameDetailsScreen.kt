@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.devpush.features.gameDetails.domain.model.GameDetails
 import kmp.features.generated.resources.Res
 import kmp.features.generated.resources.developers
 import kmp.features.generated.resources.game_count
@@ -50,6 +51,7 @@ import kmp.features.generated.resources.platforms
 import kmp.features.generated.resources.stores
 import kmp.features.generated.resources.tags
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -132,7 +134,7 @@ fun GameDetailsScreenContent(
                         )
 
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
-                            items(data.platforms) {
+                            items(data.platforms) { 
                                 Card(
                                     modifier = Modifier.padding(12.dp).wrapContentSize(),
                                     shape = RoundedCornerShape(12.dp),
@@ -232,7 +234,7 @@ fun GameDetailsScreenContent(
                         modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth(),
                     ) {
 
-                        data.tags.forEach {
+                        data.tags.forEach { 
                             Row(
                                 modifier = Modifier.padding(top = 8.dp, end = 12.dp).background(
                                     color = Color.White,
@@ -366,4 +368,26 @@ fun GameDetailsScreenContent(
     }
 
 
+}
+
+@Preview
+@Composable
+fun GameDetailsScreenContentPreview() {
+    val sampleData = GameDetails(
+        id = 1,
+        name = "Sample Game",
+        description = "This is a sample game description.",
+        backgroundImage = "",
+        platforms = listOf(),
+        stores = listOf(),
+        tags = listOf(),
+        developers = listOf(),
+        additionalImage = null
+    )
+    GameDetailsScreenContent(
+        uiState = GameDetailsUiState(data = sampleData),
+        onDelete = {},
+        onSave = { _, _, _ -> },
+        onBackClick = {}
+    )
 }
