@@ -154,3 +154,143 @@ WHERE
 ORDER BY g.rating DESC, g.name ASC
 LIMIT ? OFFSET ?;
 
+-- Game Collections Schema
+-- Collections table
+CREATE TABLE game_collection(
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    type TEXT NOT NULL,
+    description TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+-- Collection-Game relationship
+CREATE TABLE collection_game(
+    collection_id TEXT NOT NULL,
+    game_id INTEGER NOT NULL,
+    added_at INTEGER NOT NULL,
+    PRIMARY KEY (collection_id, game_id),
+    FOREIGN KEY (collection_id) REFERENCES game_collection(id) ON DELETE CASCADE,
+    FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
+);
+
+-- Indexes for performance optimization
+CREATE INDEX IF NOT EXISTS idx_collection_type ON game_collection(type);
+CREATE INDEX IF NOT EXISTS idx_collection_updated_at ON game_collection(updated_at);
+CREATE INDEX IF NOT EXISTS idx_collection_name ON game_collection(name);
+CREATE INDEX IF NOT EXISTS idx_collection_game_collection_id ON collection_game(collection_id);
+CREATE INDEX IF NOT EXISTS idx_collection_game_game_id ON collection_game(game_id);
+CREATE INDEX IF NOT EXISTS idx_collection_game_added_at ON collection_game(added_at);
+
+-- Collection operations
+createCollection:
+INSERT INTO game_collection(id, name, type, description, created_at, updated_at) 
+VALUES(?, ?, ?, ?, ?, ?);
+
+getAllCollections:
+SELECT * FROM game_collection ORDER BY 
+  CASE type 
+    WHEN 'WISHLIST' THEN 1 
+    WHEN 'CURRENTLY_PLAYING' THEN 2 
+    WHEN 'COMPLETED' THEN 3 
+    ELSE 4 
+  END, 
+  name ASC;
+
+getCollectionById:
+SELECT * FROM game_collection WHERE id = ?;
+
+getCollectionsByType:
+SELECT * FROM game_collection WHERE type = ? ORDER BY name ASC;
+
+updateCollection:
+UPDATE game_collection 
+SET name = ?, description = ?, updated_at = ? 
+WHERE id = ?;
+
+deleteCollection:
+DELETE FROM game_collection WHERE id = ?;
+
+getCollectionWithGameCount:
+SELECT c.id, c.name, c.type, c.description, c.created_at, c.updated_at, COUNT(cg.game_id) AS gameCount 
+FROM game_collection c 
+LEFT JOIN collection_game cg ON c.id = cg.collection_id 
+GROUP BY c.id, c.name, c.type, c.description, c.created_at, c.updated_at 
+ORDER BY 
+  CASE c.type 
+    WHEN 'WISHLIST' THEN 1 
+    WHEN 'CURRENTLY_PLAYING' THEN 2 
+    WHEN 'COMPLETED' THEN 3 
+    ELSE 4 
+  END, 
+  c.name ASC;
+
+-- Collection-Game relationship operations
+addGameToCollection:
+INSERT OR REPLACE INTO collection_game(collection_id, game_id, added_at) 
+VALUES(?, ?, ?);
+
+removeGameFromCollection:
+DELETE FROM collection_game 
+WHERE collection_id = ? AND game_id = ?;
+
+getGamesInCollection:
+SELECT g.*, cg.added_at 
+FROM game g 
+INNER JOIN collection_game cg ON g.id = cg.game_id 
+WHERE cg.collection_id = ? 
+ORDER BY cg.added_at DESC;
+
+getCollectionsForGame:
+SELECT c.* 
+FROM game_collection c 
+INNER JOIN collection_game cg ON c.id = cg.collection_id 
+WHERE cg.game_id = ?;
+
+checkGameInCollection:
+SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS gameExists 
+FROM collection_game 
+WHERE collection_id = ? AND game_id = ?;
+
+getGameCountInCollection:
+SELECT COUNT(*) AS gameCount 
+FROM collection_game 
+WHERE collection_id = ?;
+
+-- Batch operations for performance
+removeAllGamesFromCollection:
+DELETE FROM collection_game WHERE collection_id = ?;
+
+getCollectionsByGameId:
+SELECT c.id, c.name, c.type 
+FROM game_collection c 
+INNER JOIN collection_game cg ON c.id = cg.collection_id 
+WHERE cg.game_id = ?;
+
+-- Advanced queries for collection management
+getRecentlyAddedGames:
+SELECT g.id, g.name, g.image, g.rating, g.release_date, cg.added_at, c.name AS collectionName 
+FROM game g 
+INNER JOIN collection_game cg ON g.id = cg.game_id 
+INNER JOIN game_collection c ON cg.collection_id = c.id 
+ORDER BY cg.added_at DESC 
+LIMIT ?;
+
+getCollectionStats:
+SELECT 
+  c.id,
+  c.name,
+  c.type,
+  COUNT(cg.game_id) AS totalGames,
+  MAX(cg.added_at) AS lastUpdated
+FROM game_collection c 
+LEFT JOIN collection_game cg ON c.id = cg.collection_id 
+GROUP BY c.id, c.name, c.type;
+
+-- Search collections by name
+searchCollectionsByName:
+SELECT * FROM game_collection 
+WHERE name LIKE '%' || ? || '%' 
+ORDER BY name ASC;
+

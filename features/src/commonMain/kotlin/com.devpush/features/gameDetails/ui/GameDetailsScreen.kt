@@ -23,14 +23,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.devpush.features.gameDetails.domain.model.GameDetails
+import com.devpush.features.game.domain.model.Game
+import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.game.ui.components.AddToCollectionDialog
 import kmp.features.generated.resources.Res
 import kmp.features.generated.resources.developers
 import kmp.features.generated.resources.game_count
@@ -65,10 +75,15 @@ fun GameDetailsScreen(modifier: Modifier = Modifier, id: String, onBackClick: ()
     }
 
     GameDetailsScreenContent(
-        modifier = modifier.fillMaxSize(), uiState = uiState.value,
+        modifier = modifier.fillMaxSize(), 
+        uiState = uiState.value,
         onDelete = { viewModel.delete(it) },
         onSave = { id, name, image -> viewModel.save(id, image, name) },
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onShowAddToCollectionDialog = { viewModel.showAddToCollectionDialog() },
+        onQuickAddToCollection = { collectionType -> viewModel.quickAddToDefaultCollection(collectionType) },
+        onAddToCollection = { collection -> viewModel.addToCollection(collection) },
+        onHideAddToCollectionDialog = { viewModel.hideAddToCollectionDialog() }
     )
 }
 
@@ -79,7 +94,11 @@ fun GameDetailsScreenContent(
     uiState: GameDetailsUiState,
     onDelete: (Int) -> Unit,
     onSave: (id: Int, title: String, image: String) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onShowAddToCollectionDialog: () -> Unit = {},
+    onQuickAddToCollection: (CollectionType) -> Unit = {},
+    onAddToCollection: (com.devpush.features.game.domain.model.collections.GameCollection) -> Unit = {},
+    onHideAddToCollectionDialog: () -> Unit = {}
 ) {
     if (uiState.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -313,6 +332,7 @@ fun GameDetailsScreenContent(
 
             }
 
+            // Top action buttons
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -347,7 +367,6 @@ fun GameDetailsScreenContent(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-
                 IconButton(
                     onClick = {
                         onDelete(data.id)
@@ -359,15 +378,108 @@ fun GameDetailsScreenContent(
                         modifier = Modifier.padding(4.dp)
                     )
                 }
-
+            }
+            
+            // Collection management buttons (bottom-right)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Quick add to default collections
+                CollectionType.getDefaultTypes().forEach { collectionType ->
+                    val isInCollection = uiState.gameCollectionTypes.contains(collectionType)
+                    
+                    SmallFloatingActionButton(
+                        onClick = { onQuickAddToCollection(collectionType) },
+                        containerColor = if (isInCollection) {
+                            getCollectionTypeColor(collectionType)
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                        contentColor = if (isInCollection) {
+                            Color.White
+                        } else {
+                            getCollectionTypeColor(collectionType)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isInCollection) Icons.Default.Check else getCollectionTypeIcon(collectionType),
+                            contentDescription = collectionType.displayName,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+                
+                // Add to Collection button
+                ExtendedFloatingActionButton(
+                    onClick = onShowAddToCollectionDialog,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add to collection",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Collections")
+                }
             }
 
+        }
+        
+        // Add to Collection Dialog
+        if (uiState.showAddToCollectionDialog && uiState.data != null) {
+            val game = Game(
+                id = uiState.data.id,
+                name = uiState.data.name,
+                imageUrl = uiState.data.backgroundImage,
+                platforms = emptyList(),
+                genres = emptyList(),
+                rating = 0.0,
+                releaseDate = null
+            )
+            
+            AddToCollectionDialog(
+                game = game,
+                collections = uiState.collections,
+                onDismiss = onHideAddToCollectionDialog,
+                onAddToCollection = onAddToCollection
+            )
         }
 
 
     }
 
 
+}
+
+/**
+ * Gets the appropriate icon for a collection type
+ */
+@Composable
+private fun getCollectionTypeIcon(type: CollectionType): androidx.compose.ui.graphics.vector.ImageVector {
+    return when (type) {
+        CollectionType.WISHLIST -> Icons.Default.Favorite
+        CollectionType.CURRENTLY_PLAYING -> Icons.Default.PlayArrow
+        CollectionType.COMPLETED -> Icons.Default.Star
+        CollectionType.CUSTOM -> Icons.Default.Add
+    }
+}
+
+/**
+ * Gets the appropriate color for a collection type
+ */
+@Composable
+private fun getCollectionTypeColor(type: CollectionType): Color {
+    return when (type) {
+        CollectionType.WISHLIST -> MaterialTheme.colorScheme.primary
+        CollectionType.CURRENTLY_PLAYING -> MaterialTheme.colorScheme.secondary
+        CollectionType.COMPLETED -> MaterialTheme.colorScheme.tertiary
+        CollectionType.CUSTOM -> MaterialTheme.colorScheme.outline
+    }
 }
 
 @Preview

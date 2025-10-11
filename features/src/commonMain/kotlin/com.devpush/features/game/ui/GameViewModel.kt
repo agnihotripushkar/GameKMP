@@ -6,12 +6,16 @@ import com.devpush.features.game.domain.repository.GameRepository
 import com.devpush.features.game.domain.usecase.SearchGamesUseCase
 import com.devpush.features.game.domain.usecase.FilterGamesUseCase
 import com.devpush.features.game.domain.usecase.GetAvailableFiltersUseCase
+import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
+import com.devpush.features.game.domain.usecase.AddGameToCollectionUseCase
 import com.devpush.features.game.domain.usecase.FilterOptions
 import com.devpush.features.game.domain.model.Platform
 import com.devpush.features.game.domain.model.Genre
 import com.devpush.features.game.domain.model.SearchFilterState
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.SearchFilterError
+import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.game.domain.model.collections.CollectionType
 import com.devpush.features.game.domain.validation.FilterValidator
 import com.devpush.features.game.domain.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +37,9 @@ class GameViewModel(
     private val gameRepository: GameRepository,
     private val searchGamesUseCase: SearchGamesUseCase,
     private val filterGamesUseCase: FilterGamesUseCase,
-    private val getAvailableFiltersUseCase: GetAvailableFiltersUseCase
+    private val getAvailableFiltersUseCase: GetAvailableFiltersUseCase,
+    private val getCollectionsUseCase: GetCollectionsUseCase,
+    private val addGameToCollectionUseCase: AddGameToCollectionUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(GameUiState())
@@ -51,6 +57,7 @@ class GameViewModel(
 
     init {
         getGames()
+        loadCollections()
     }
 
     fun getGames() {
@@ -397,6 +404,87 @@ class GameViewModel(
     private fun clearCaches() {
         searchCache.clear()
         filterCache.clear()
+    }
+    
+    // Collection-related methods
+    
+    fun loadCollections() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isCollectionsLoading = true) }
+            
+            getCollectionsUseCase().fold(
+                onSuccess = { collectionsWithCount ->
+                    val collections = collectionsWithCount.map { it.collection }
+                    val gameCollectionMap = buildGameCollectionMap(collections)
+                    
+                    _uiState.update { 
+                        it.copy(
+                            collections = collections,
+                            gameCollectionMap = gameCollectionMap,
+                            isCollectionsLoading = false
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update { 
+                        it.copy(isCollectionsLoading = false)
+                    }
+                    // Silently fail for collections loading to not disrupt main game functionality
+                }
+            )
+        }
+    }
+    
+    fun showAddToCollectionDialog(game: Game) {
+        _uiState.update { 
+            it.copy(
+                showAddToCollectionDialog = true,
+                selectedGameForCollection = game
+            )
+        }
+    }
+    
+    fun hideAddToCollectionDialog() {
+        _uiState.update { 
+            it.copy(
+                showAddToCollectionDialog = false,
+                selectedGameForCollection = null
+            )
+        }
+    }
+    
+    fun addGameToCollection(collection: GameCollection) {
+        val selectedGame = _uiState.value.selectedGameForCollection ?: return
+        
+        viewModelScope.launch {
+            addGameToCollectionUseCase(
+                collectionId = collection.id,
+                gameId = selectedGame.id,
+                confirmTransition = true
+            ).fold(
+                onSuccess = {
+                    // Refresh collections to update the UI
+                    loadCollections()
+                    hideAddToCollectionDialog()
+                },
+                onFailure = { error ->
+                    // Handle error - could show a snackbar or error dialog
+                    hideAddToCollectionDialog()
+                }
+            )
+        }
+    }
+    
+    private fun buildGameCollectionMap(collections: List<GameCollection>): Map<Int, List<CollectionType>> {
+        val gameCollectionMap = mutableMapOf<Int, MutableList<CollectionType>>()
+        
+        collections.forEach { collection ->
+            collection.gameIds.forEach { gameId ->
+                gameCollectionMap.getOrPut(gameId) { mutableListOf() }.add(collection.type)
+            }
+        }
+        
+        return gameCollectionMap.mapValues { it.value.toList() }
     }
     
     override fun onCleared() {

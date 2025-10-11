@@ -10,7 +10,9 @@ fun getGameViewModelModule() = module {
             gameRepository = get(),
             searchGamesUseCase = get(),
             filterGamesUseCase = get(),
-            getAvailableFiltersUseCase = get()
+            getAvailableFiltersUseCase = get(),
+            getCollectionsUseCase = get(),
+            addGameToCollectionUseCase = get()
         ) 
     }
 }
