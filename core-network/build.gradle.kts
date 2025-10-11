@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -29,11 +28,7 @@ kotlin {
         }
     }
 
-//    jvm("desktop")
-
     sourceSets {
-//        val desktopMain by getting
-
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -61,12 +56,6 @@ kotlin {
 
 
         }
-//        desktopMain.dependencies {
-//            implementation(compose.desktop.currentOs)
-//            implementation(libs.kotlinx.coroutines.swing)
-//
-//            implementation(libs.ktor.client.desktop)
-//        }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.ios)
@@ -106,14 +95,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
-//compose.desktop {
-//    application {
-//
-//        nativeDistributions {
-//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//            packageName = "com.devpush.coreNetwork"
-//            packageVersion = "1.0.0"
-//        }
-//    }
-//}

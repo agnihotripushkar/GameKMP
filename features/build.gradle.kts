@@ -1,5 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -28,11 +26,7 @@ kotlin {
         }
     }
 
-//    jvm("desktop")
-
     sourceSets {
-//        val desktopMain by getting
-
         commonMain.dependencies{
             implementation(projects.coreNetwork)
             implementation(projects.coreDatabase)
@@ -76,10 +70,6 @@ kotlin {
             // KMP dependencies declared in commonMain.
 
         }
-
-//        desktopMain.dependencies {
-//            implementation(compose.desktop.currentOs)
-//        }
     }
 }
 
@@ -110,14 +100,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
-//compose.desktop {
-//    application {
-//
-//        nativeDistributions {
-//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//            packageName = "com.devpush.features"
-//            packageVersion = "1.0.0"
-//        }
-//    }
-//}

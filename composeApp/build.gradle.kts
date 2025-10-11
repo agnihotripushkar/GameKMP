@@ -1,4 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -39,8 +38,6 @@ kotlin {
         }
     }
 
-//    jvm("desktop")
-
 //    @OptIn(ExperimentalWasmDsl::class)
 //    wasmJs {
 //        browser {
@@ -62,8 +59,6 @@ kotlin {
 //    }
 
     sourceSets {
-//        val desktopMain by getting
-
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -110,13 +105,6 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
-        //        desktopMain.dependencies {
-//            implementation(compose.desktop.currentOs)
-//            implementation(libs.kotlinx.coroutines.swing)
-//
-//            implementation(libs.ktor.client.desktop)
-//            implementation(libs.sql.delight.desktop)
-//        }
     }
 }
 
@@ -153,15 +141,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
-//compose.desktop {
-//    application {
-//        mainClass = "com.devpush.kmp.MainKt"
-//
-//        nativeDistributions {
-//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//            packageName = "com.devpush.kmp"
-//            packageVersion = "1.0.0"
-//        }
-//    }
-//}

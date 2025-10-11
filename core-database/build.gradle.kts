@@ -1,5 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -28,11 +26,7 @@ kotlin {
         }
     }
 
-//    jvm("desktop")
-
     sourceSets {
-//        val desktopMain by getting
-
         commonMain.dependencies{
 
                 implementation(compose.runtime)
@@ -72,11 +66,6 @@ kotlin {
                 implementation(libs.sql.delight.ios)
 
         }
-
-//        desktopMain.dependencies {
-//            implementation(compose.desktop.currentOs)
-//            implementation(libs.sql.delight.desktop)
-//        }
     }
 }
 
@@ -117,14 +106,3 @@ android {
 dependencies {
     debugImplementation(compose.uiTooling)
 }
-
-//compose.desktop {
-//    application {
-//
-//        nativeDistributions {
-//            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-//            packageName = "com.devpush.coreDatabase"
-//            packageVersion = "1.0.0"
-//        }
-//    }
-//}
