@@ -69,14 +69,13 @@ kotlin {
     }
 }
 
-sqldelight{
-    databases{
-        create("AppDatabase"){
-            packageName = "com.devpush.coreDatabase"
-            srcDirs("src/commonMain/sqldelight")
+sqldelight {
+    databases {
+        create("AppDatabase") {
+            packageName.set("com.devpush.coreDatabase")
+            srcDirs.setFrom("src/commonMain/sqldelight")
         }
     }
-    linkSqlite = true
 }
 
 android {

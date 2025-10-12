@@ -85,7 +85,7 @@ fun GameScreen(
     LaunchedEffect(uiState.value.filterError) {
         uiState.value.filterError?.let { error ->
             snackbarHostState.showSnackbar(
-                message = error.message,
+                message = error.message ?: "An error occurred",
                 actionLabel = "Retry"
             )
         }
@@ -278,7 +278,7 @@ fun GameScreen(
                                 color = MaterialTheme.colorScheme.error
                             )
                             Text(
-                                text = error.message,
+                                text = error.message ?: "An error occurred",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

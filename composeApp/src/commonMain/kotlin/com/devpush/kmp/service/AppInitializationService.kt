@@ -51,7 +51,7 @@ class AppInitializationServiceImpl(
                 },
                 onFailure = { error ->
                     Napier.e("Collections initialization failed", error)
-                    return@try Result.failure(
+                    return Result.failure(
                         Exception("Failed to initialize collections: ${error.message}", error)
                     )
                 }

@@ -49,6 +49,8 @@ kotlin {
             implementation(libs.coil.ktor)
 
             implementation(libs.material.icons.core)
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
 
         }
 

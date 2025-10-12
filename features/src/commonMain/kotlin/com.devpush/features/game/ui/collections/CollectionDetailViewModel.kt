@@ -194,6 +194,41 @@ class CollectionDetailViewModel(
     }
 
     /**
+     * Adds multiple games to the collection
+     * @param gameIds List of game IDs to add
+     */
+    fun addGamesToCollection(gameIds: List<Int>) {
+        addGameJob?.cancel()
+        addGameJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Add games one by one
+                for (gameId in gameIds) {
+                    addGameToCollectionUseCase(collectionId, gameId)
+                }
+                
+                // Refresh collection to show new games
+                refresh()
+                
+                _uiState.update { 
+                    it.copy(
+                        showAddGamesDialog = false,
+                        error = null
+                    )
+                }
+            } catch (exception: Exception) {
+                val error = CollectionError.UnknownError(
+                    "Failed to add games: ${exception.message}",
+                    exception
+                )
+                
+                _uiState.update { 
+                    it.copy(error = error)
+                }
+            }
+        }
+    }
+
+    /**
      * Removes a game from the collection
      * @param gameId The ID of the game to remove
      */

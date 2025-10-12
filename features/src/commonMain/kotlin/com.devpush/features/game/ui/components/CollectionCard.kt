@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.devpush.features.game.domain.model.collections.CollectionType
 import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.game.domain.usecase.CollectionWithCount
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -63,7 +64,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CollectionCard(
-    collection: GameCollection,
+    collection: CollectionWithCount,
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -119,7 +120,7 @@ fun CollectionCard(
                     }
                     
                     // Default collection indicator
-                    if (collection.isDefaultCollection()) {
+                    if (collection.collection.isDefaultCollection()) {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
@@ -161,7 +162,7 @@ fun CollectionCard(
                 ) {
                     // Game count
                     Text(
-                        text = "${collection.getGameCount()} ${if (collection.getGameCount() == 1) "game" else "games"}",
+                        text = "${collection.gameCount} ${if (collection.gameCount == 1) "game" else "games"}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         fontWeight = FontWeight.Medium
@@ -290,7 +291,7 @@ fun CollectionCard(
                 }
                 
                 // Share option - if callback provided and collection has games
-                if (collection.getGameCount() > 0) {
+                if (collection.gameCount > 0) {
                     onShare?.let { shareCallback ->
                         DropdownMenuItem(
                             text = {
@@ -348,13 +349,16 @@ private fun getCollectionCardColor(type: CollectionType): Color {
 @Composable
 fun CollectionCardPreview() {
     CollectionCard(
-        collection = GameCollection(
-            id = "1",
-            name = "My Wishlist",
-            type = CollectionType.WISHLIST,
-            gameIds = listOf(1, 2, 3, 4, 5),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        collection = CollectionWithCount(
+            collection = GameCollection(
+                id = "1",
+                name = "My Wishlist",
+                type = CollectionType.WISHLIST,
+                gameIds = listOf(1, 2, 3, 4, 5),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 5
         ),
         onClick = {},
         onEdit = {},
@@ -366,13 +370,16 @@ fun CollectionCardPreview() {
 @Composable
 fun CollectionCardCustomPreview() {
     CollectionCard(
-        collection = GameCollection(
-            id = "2",
-            name = "Indie Games Collection",
-            type = CollectionType.CUSTOM,
-            gameIds = listOf(1, 2),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        collection = CollectionWithCount(
+            collection = GameCollection(
+                id = "2",
+                name = "Indie Games Collection",
+                type = CollectionType.CUSTOM,
+                gameIds = listOf(1, 2),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 2
         ),
         onClick = {},
         onEdit = {},
@@ -384,13 +391,16 @@ fun CollectionCardCustomPreview() {
 @Composable
 fun CollectionCardEmptyPreview() {
     CollectionCard(
-        collection = GameCollection(
-            id = "3",
-            name = "Currently Playing",
-            type = CollectionType.CURRENTLY_PLAYING,
-            gameIds = emptyList(),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        collection = CollectionWithCount(
+            collection = GameCollection(
+                id = "3",
+                name = "Currently Playing",
+                type = CollectionType.CURRENTLY_PLAYING,
+                gameIds = emptyList(),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 0
         ),
         onClick = {},
         onEdit = {},

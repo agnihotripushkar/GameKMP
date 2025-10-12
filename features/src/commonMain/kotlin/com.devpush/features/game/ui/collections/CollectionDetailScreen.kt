@@ -81,16 +81,16 @@ fun CollectionDetailScreen(
     val pullToRefreshState = rememberPullToRefreshState()
     var showAddGamesDialog by remember { mutableStateOf(false) }
 
-    // Initialize with collection ID
+    // Initialize collection loading
     LaunchedEffect(collectionId) {
-        viewModel.loadCollection(collectionId)
+        viewModel.loadCollection()
     }
 
     // Show snackbar for errors
     LaunchedEffect(uiState.value.error) {
         uiState.value.error?.let { error ->
             snackbarHostState.showSnackbar(
-                message = error.message,
+                message = error.message ?: "An error occurred",
                 actionLabel = "Retry"
             )
         }
@@ -130,7 +130,7 @@ fun CollectionDetailScreen(
                     
                     // Refresh button
                     IconButton(
-                        onClick = { viewModel.refreshCollection() },
+                        onClick = { viewModel.refresh() },
                         enabled = !uiState.value.isLoading && !uiState.value.isRefreshing
                     ) {
                         val infiniteTransition = rememberInfiniteTransition()
@@ -178,7 +178,7 @@ fun CollectionDetailScreen(
     ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = uiState.value.isRefreshing,
-            onRefresh = { viewModel.refreshCollection() },
+            onRefresh = { viewModel.refresh() },
             state = pullToRefreshState,
             modifier = Modifier
                 .fillMaxSize()
@@ -258,7 +258,7 @@ fun CollectionDetailScreen(
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = uiState.value.error!!.message,
+                                text = uiState.value.error!!.message ?: "An error occurred",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center,

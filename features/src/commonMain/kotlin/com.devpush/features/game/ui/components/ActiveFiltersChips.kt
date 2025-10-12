@@ -127,16 +127,10 @@ fun ActiveFiltersChips(
                         AnimatedVisibility(
                             visible = true,
                             enter = scaleIn(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessMedium
-                                ).let { spec ->
-                                    // Stagger the animation based on index
-                                    tween(
-                                        durationMillis = spec.durationMillis,
-                                        delayMillis = index * 50
-                                    )
-                                }
+                                animationSpec = tween(
+                                    durationMillis = 300,
+                                    delayMillis = index * 50
+                                )
                             ) + fadeIn(
                                 animationSpec = tween(
                                     durationMillis = 200,
@@ -171,16 +165,10 @@ fun ActiveFiltersChips(
                         AnimatedVisibility(
                             visible = true,
                             enter = scaleIn(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessMedium
-                                ).let { spec ->
-                                    // Stagger the animation based on index + platform count
-                                    tween(
-                                        durationMillis = spec.durationMillis,
-                                        delayMillis = (selectedPlatforms.size + index) * 50
-                                    )
-                                }
+                                animationSpec = tween(
+                                    durationMillis = 300,
+                                    delayMillis = (selectedPlatforms.size + index) * 50
+                                )
                             ) + fadeIn(
                                 animationSpec = tween(
                                     durationMillis = 200,

@@ -246,6 +246,63 @@ class CollectionsViewModel(
     }
 
     /**
+     * Deletes a collection by ID
+     * @param collectionId The ID of the collection to delete
+     */
+    fun deleteCollection(collectionId: String) {
+        deleteCollectionJob?.cancel()
+        deleteCollectionJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.update { 
+                    it.copy(
+                        isDeleting = true,
+                        deleteError = null
+                    )
+                }
+                
+                val result = deleteCollectionUseCase(
+                    collectionId = collectionId,
+                    confirmDeletion = true,
+                    allowDefaultDeletion = false
+                )
+                
+                result.onSuccess { deletionInfo ->
+                    // Refresh collections to remove the deleted one
+                    loadCollections(forceRefresh = true)
+                    
+                    _uiState.update { 
+                        it.copy(
+                            isDeleting = false,
+                            deleteError = null
+                        )
+                    }
+                }.onFailure { exception ->
+                    val errorMessage = when (exception) {
+                        is CollectionError.DefaultCollectionProtected -> "Default collections cannot be deleted"
+                        is CollectionError.CollectionNotFound -> "Collection not found"
+                        is CollectionError.DatabaseError -> "Database error occurred. Please try again."
+                        else -> "Failed to delete collection: ${exception.message}"
+                    }
+                    
+                    _uiState.update { 
+                        it.copy(
+                            isDeleting = false,
+                            deleteError = errorMessage
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _uiState.update { 
+                    it.copy(
+                        isDeleting = false,
+                        deleteError = "Failed to delete collection: ${exception.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
      * Deletes the currently selected collection
      */
     fun confirmDeleteCollection() {

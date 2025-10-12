@@ -187,7 +187,7 @@ class GameCollectionRepositoryImpl(
             
             // Check if game is already in collection
             val gameExists = appDatabase.appDatabaseQueries.checkGameInCollection(collectionId, gameId.toLong()).executeAsOne()
-            if (gameExists.gameExists == 1L) {
+            if (gameExists == 1L) {
                 return Result.failure(CollectionError.DuplicateGameInCollection(gameId, collectionExists.name))
             }
             
@@ -229,7 +229,7 @@ class GameCollectionRepositoryImpl(
             
             // Check if game is in collection
             val gameExists = appDatabase.appDatabaseQueries.checkGameInCollection(collectionId, gameId.toLong()).executeAsOne()
-            if (gameExists.gameExists == 0L) {
+            if (gameExists == 0L) {
                 return Result.failure(CollectionError.GameNotInCollection(gameId, collectionExists.name))
             }
             

@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.devpush.features.game.domain.model.collections.CollectionError
 import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.game.domain.usecase.CollectionWithCount
 import com.devpush.features.game.ui.components.CollectionCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.game.domain.model.collections.CollectionType
@@ -47,12 +48,12 @@ import com.devpush.features.game.domain.model.collections.CollectionType
  */
 @Composable
 fun CollectionGrid(
-    collections: List<GameCollection>,
+    collections: List<CollectionWithCount>,
     onCollectionClick: (String) -> Unit,
-    onEditCollection: (GameCollection) -> Unit,
-    onDeleteCollection: (GameCollection) -> Unit,
-    onViewCollectionDetails: ((GameCollection) -> Unit)? = null,
-    onShareCollection: ((GameCollection) -> Unit)? = null,
+    onEditCollection: (CollectionWithCount) -> Unit,
+    onDeleteCollection: (CollectionWithCount) -> Unit,
+    onViewCollectionDetails: ((CollectionWithCount) -> Unit)? = null,
+    onShareCollection: ((CollectionWithCount) -> Unit)? = null,
     isLoading: Boolean = false,
     error: CollectionError? = null,
     modifier: Modifier = Modifier,
@@ -145,7 +146,7 @@ fun EmptyCollectionsState(
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Default.VideoLibrary,
+            imageVector = Icons.Default.Folder,
             contentDescription = "No collections",
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
@@ -257,6 +258,8 @@ private fun getErrorMessage(error: CollectionError): String {
             "A collection with this name already exists."
         is CollectionError.DuplicateGameInCollection -> 
             "This game is already in the collection."
+        else -> 
+            "An error occurred: ${error.message}"
     }
 }
 
@@ -264,37 +267,49 @@ private fun getErrorMessage(error: CollectionError): String {
 @Composable
 fun CollectionGridPreview() {
     val sampleCollections = listOf(
-        GameCollection(
-            id = "1",
-            name = "Wishlist",
-            type = CollectionType.WISHLIST,
-            gameIds = listOf(1, 2, 3, 4, 5),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        CollectionWithCount(
+            collection = GameCollection(
+                id = "1",
+                name = "Wishlist",
+                type = CollectionType.WISHLIST,
+                gameIds = listOf(1, 2, 3, 4, 5),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 5
         ),
-        GameCollection(
-            id = "2",
-            name = "Currently Playing",
-            type = CollectionType.CURRENTLY_PLAYING,
-            gameIds = listOf(6, 7),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        CollectionWithCount(
+            collection = GameCollection(
+                id = "2",
+                name = "Currently Playing",
+                type = CollectionType.CURRENTLY_PLAYING,
+                gameIds = listOf(6, 7),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 2
         ),
-        GameCollection(
-            id = "3",
-            name = "Completed",
-            type = CollectionType.COMPLETED,
-            gameIds = listOf(8, 9, 10, 11, 12, 13),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        CollectionWithCount(
+            collection = GameCollection(
+                id = "3",
+                name = "Completed",
+                type = CollectionType.COMPLETED,
+                gameIds = listOf(8, 9, 10, 11, 12, 13),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 6
         ),
-        GameCollection(
-            id = "4",
-            name = "Indie Favorites",
-            type = CollectionType.CUSTOM,
-            gameIds = listOf(14, 15, 16),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+        CollectionWithCount(
+            collection = GameCollection(
+                id = "4",
+                name = "Indie Favorites",
+                type = CollectionType.CUSTOM,
+                gameIds = listOf(14, 15, 16),
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            ),
+            gameCount = 3
         )
     )
     

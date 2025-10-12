@@ -73,7 +73,7 @@ fun CollectionsScreen(
     LaunchedEffect(uiState.value.error) {
         uiState.value.error?.let { error ->
             snackbarHostState.showSnackbar(
-                message = error.message,
+                message = error.message ?: "An error occurred",
                 actionLabel = "Retry"
             )
         }
@@ -210,7 +210,7 @@ fun CollectionsScreen(
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = uiState.value.error!!.message,
+                                text = uiState.value.error!!.message ?: "An error occurred",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.padding(bottom = 24.dp)
@@ -279,11 +279,11 @@ fun CollectionsScreen(
                                     viewModel.startEditingCollection(collection.collection)
                                 },
                                 onDeleteCollection = { collection ->
-                                    viewModel.showDeleteConfirmation(collection.collection)
+                                    viewModel.deleteCollection(collection.id)
                                 },
                                 onViewCollectionDetails = { collection ->
                                     // Navigate to collection details
-                                    onCollectionClick(collection.collection.id)
+                                    onCollectionClick(collection.id)
                                 },
                                 onShareCollection = { collection ->
                                     // TODO: Implement sharing functionality

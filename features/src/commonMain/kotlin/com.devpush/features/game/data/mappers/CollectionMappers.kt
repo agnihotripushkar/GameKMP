@@ -2,7 +2,7 @@ package com.devpush.features.game.data.mappers
 
 import com.devpush.features.game.domain.model.collections.GameCollection
 import com.devpush.features.game.domain.model.collections.CollectionType
-import com.devpush.coreDatabase.Game_collection
+import comdevpushcoreDatabase.Game_collection
 
 /**
  * Maps database entity to domain model
