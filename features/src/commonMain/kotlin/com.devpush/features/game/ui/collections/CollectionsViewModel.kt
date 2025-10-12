@@ -8,6 +8,8 @@ import com.devpush.features.game.domain.model.collections.GameCollection
 import com.devpush.features.game.domain.usecase.CreateCollectionUseCase
 import com.devpush.features.game.domain.usecase.DeleteCollectionUseCase
 import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
+import com.devpush.features.game.domain.usecase.UpdateCollectionUseCase
+import com.devpush.features.game.domain.usecase.InitializeDefaultCollectionsUseCase
 import com.devpush.features.game.domain.usecase.CollectionWithCount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -34,13 +36,19 @@ data class CollectionsUiState(
     val error: CollectionError? = null,
     val editingCollection: GameCollection? = null,
     val showCreateDialog: Boolean = false,
-    val showDeleteConfirmation: String? = null // Collection ID to delete
+    val collectionToDelete: GameCollection? = null, // Collection to delete
+    val isDeleting: Boolean = false,
+    val deleteError: String? = null,
+    val isUpdating: Boolean = false,
+    val updateError: String? = null
 )
 
 class CollectionsViewModel(
     private val getCollectionsUseCase: GetCollectionsUseCase,
     private val createCollectionUseCase: CreateCollectionUseCase,
-    private val deleteCollectionUseCase: DeleteCollectionUseCase
+    private val deleteCollectionUseCase: DeleteCollectionUseCase,
+    private val updateCollectionUseCase: UpdateCollectionUseCase,
+    private val initializeDefaultCollectionsUseCase: InitializeDefaultCollectionsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CollectionsUiState())
@@ -49,9 +57,49 @@ class CollectionsViewModel(
     private var loadCollectionsJob: Job? = null
     private var createCollectionJob: Job? = null
     private var deleteCollectionJob: Job? = null
+    private var updateCollectionJob: Job? = null
 
     init {
-        loadCollections()
+        initializeAndLoadCollections()
+    }
+
+    /**
+     * Initializes default collections and loads all collections
+     */
+    private fun initializeAndLoadCollections() {
+        loadCollectionsJob?.cancel()
+        loadCollectionsJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.update { 
+                    it.copy(
+                        isLoading = true,
+                        error = null
+                    ) 
+                }
+                
+                // First initialize default collections
+                initializeDefaultCollectionsUseCase()
+                
+                // Then load all collections
+                loadCollections(forceRefresh = true)
+                
+            } catch (exception: Exception) {
+                val error = when (exception) {
+                    is CollectionError -> exception
+                    else -> CollectionError.UnknownError(
+                        "Failed to initialize collections: ${exception.message}",
+                        exception
+                    )
+                }
+                
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = error
+                    ) 
+                }
+            }
+        }
     }
 
     /**
@@ -60,13 +108,8 @@ class CollectionsViewModel(
      */
     fun loadCollections(forceRefresh: Boolean = false) {
         loadCollectionsJob?.cancel()
-        loadCollectionsJob = flow {
-            emit(getCollectionsUseCase(forceRefresh))
-        }.flowOn(Dispatchers.IO)
-            .catch { exception ->
-                emit(Result.failure(exception))
-            }
-            .onStart {
+        loadCollectionsJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
                 _uiState.update { 
                     it.copy(
                         isLoading = !forceRefresh, // Don't show loading spinner for refresh
@@ -74,8 +117,9 @@ class CollectionsViewModel(
                         error = null
                     ) 
                 }
-            }
-            .onEach { result ->
+                
+                val result = getCollectionsUseCase(forceRefresh)
+                
                 result.onSuccess { collections ->
                     _uiState.update { currentState ->
                         currentState.copy(
@@ -102,8 +146,24 @@ class CollectionsViewModel(
                         ) 
                     }
                 }
+            } catch (exception: Exception) {
+                val error = when (exception) {
+                    is CollectionError -> exception
+                    else -> CollectionError.UnknownError(
+                        "Failed to load collections: ${exception.message}",
+                        exception
+                    )
+                }
+                
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        error = error
+                    ) 
+                }
             }
-            .launchIn(viewModelScope)
+        }
     }
 
     /**
@@ -116,13 +176,13 @@ class CollectionsViewModel(
     /**
      * Creates a new collection
      * @param name The name of the collection
-     * @param type The type of the collection
+     * @param description Optional description for the collection
      */
-    fun createCollection(name: String, type: CollectionType) {
+    fun createCollection(name: String, description: String? = null) {
         createCollectionJob?.cancel()
         createCollectionJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = createCollectionUseCase(name, type)
+                val result = createCollectionUseCase(name, CollectionType.CUSTOM, description)
                 
                 result.onSuccess { collection ->
                     // Refresh collections to show the new one
@@ -161,54 +221,95 @@ class CollectionsViewModel(
     }
 
     /**
-     * Deletes a collection
-     * @param collectionId The ID of the collection to delete
+     * Shows delete confirmation for a collection
+     * @param collection The collection to delete
      */
-    fun deleteCollection(collectionId: String) {
+    fun showDeleteConfirmation(collection: GameCollection) {
+        _uiState.update { 
+            it.copy(
+                collectionToDelete = collection,
+                deleteError = null
+            )
+        }
+    }
+
+    /**
+     * Hides the delete confirmation dialog
+     */
+    fun hideDeleteConfirmation() {
+        _uiState.update { 
+            it.copy(
+                collectionToDelete = null,
+                deleteError = null
+            )
+        }
+    }
+
+    /**
+     * Deletes the currently selected collection
+     */
+    fun confirmDeleteCollection() {
+        val collection = _uiState.value.collectionToDelete ?: return
+        
         deleteCollectionJob?.cancel()
         deleteCollectionJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = deleteCollectionUseCase(collectionId)
+                _uiState.update { 
+                    it.copy(
+                        isDeleting = true,
+                        deleteError = null
+                    )
+                }
                 
-                result.onSuccess {
+                val result = deleteCollectionUseCase(
+                    collectionId = collection.id,
+                    confirmDeletion = true,
+                    allowDefaultDeletion = false
+                )
+                
+                result.onSuccess { deletionInfo ->
                     // Refresh collections to remove the deleted one
                     loadCollections(forceRefresh = true)
                     
                     _uiState.update { 
                         it.copy(
-                            showDeleteConfirmation = null,
-                            error = null
+                            isDeleting = false,
+                            collectionToDelete = null,
+                            deleteError = null
                         )
                     }
                 }.onFailure { exception ->
-                    val error = when (exception) {
-                        is CollectionError -> exception
-                        else -> CollectionError.UnknownError(
-                            "Failed to delete collection: ${exception.message}",
-                            exception
-                        )
+                    val errorMessage = when (exception) {
+                        is CollectionError.DefaultCollectionProtected -> "Default collections cannot be deleted"
+                        is CollectionError.CollectionNotFound -> "Collection not found"
+                        is CollectionError.DatabaseError -> "Database error occurred. Please try again."
+                        else -> "Failed to delete collection: ${exception.message}"
                     }
                     
                     _uiState.update { 
                         it.copy(
-                            showDeleteConfirmation = null,
-                            error = error
+                            isDeleting = false,
+                            deleteError = errorMessage
                         )
                     }
                 }
             } catch (exception: Exception) {
-                val error = CollectionError.UnknownError(
-                    "Failed to delete collection: ${exception.message}",
-                    exception
-                )
-                
                 _uiState.update { 
                     it.copy(
-                        showDeleteConfirmation = null,
-                        error = error
+                        isDeleting = false,
+                        deleteError = "Failed to delete collection: ${exception.message}"
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Clears the delete error
+     */
+    fun clearDeleteError() {
+        _uiState.update { 
+            it.copy(deleteError = null)
         }
     }
 
@@ -230,24 +331,7 @@ class CollectionsViewModel(
         }
     }
 
-    /**
-     * Shows delete confirmation for a collection
-     * @param collectionId The ID of the collection to delete
-     */
-    fun showDeleteConfirmation(collectionId: String) {
-        _uiState.update { 
-            it.copy(showDeleteConfirmation = collectionId)
-        }
-    }
 
-    /**
-     * Hides the delete confirmation dialog
-     */
-    fun hideDeleteConfirmation() {
-        _uiState.update { 
-            it.copy(showDeleteConfirmation = null)
-        }
-    }
 
     /**
      * Starts editing a collection
@@ -264,8 +348,107 @@ class CollectionsViewModel(
      */
     fun stopEditingCollection() {
         _uiState.update { 
-            it.copy(editingCollection = null)
+            it.copy(
+                editingCollection = null,
+                updateError = null
+            )
         }
+    }
+
+    /**
+     * Updates a collection's name and description
+     * @param collectionId The ID of the collection to update
+     * @param newName The new name for the collection
+     * @param newDescription The new description for the collection (null for no description)
+     */
+    fun updateCollection(collectionId: String, newName: String, newDescription: String?) {
+        updateCollectionJob?.cancel()
+        updateCollectionJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.update { 
+                    it.copy(
+                        isUpdating = true,
+                        updateError = null
+                    )
+                }
+                
+                val result = updateCollectionUseCase(
+                    collectionId = collectionId,
+                    newName = newName,
+                    newDescription = newDescription,
+                    allowDefaultUpdate = false // Don't allow editing default collections by default
+                )
+                
+                result.onSuccess { updatedCollection ->
+                    // Refresh collections to show the updated one
+                    loadCollections(forceRefresh = true)
+                    
+                    _uiState.update { 
+                        it.copy(
+                            isUpdating = false,
+                            editingCollection = null,
+                            updateError = null
+                        )
+                    }
+                }.onFailure { exception ->
+                    val errorMessage = when (exception) {
+                        is CollectionError.ValidationError -> exception.reason
+                        is CollectionError.CollectionNameExists -> "A collection with this name already exists"
+                        is CollectionError.DefaultCollectionProtected -> "Cannot modify this default collection"
+                        is CollectionError.CollectionNotFound -> "Collection not found"
+                        is CollectionError.DatabaseError -> "Database error occurred. Please try again."
+                        else -> "Failed to update collection: ${exception.message}"
+                    }
+                    
+                    _uiState.update { 
+                        it.copy(
+                            isUpdating = false,
+                            updateError = errorMessage
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                _uiState.update { 
+                    it.copy(
+                        isUpdating = false,
+                        updateError = "Failed to update collection: ${exception.message}"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Clears the update error
+     */
+    fun clearUpdateError() {
+        _uiState.update { 
+            it.copy(updateError = null)
+        }
+    }
+
+    /**
+     * Shares a collection (placeholder for future implementation)
+     * @param collection The collection to share
+     */
+    fun shareCollection(collection: GameCollection) {
+        // TODO: Implement sharing functionality
+        // This could generate a shareable link, export collection data, etc.
+        // For now, we'll just show a message that sharing is not yet implemented
+        
+        val shareText = buildString {
+            append("Check out my ${collection.name} collection")
+            if (collection.getGameCount() > 0) {
+                append(" with ${collection.getGameCount()} games")
+            }
+            if (!collection.description.isNullOrBlank()) {
+                append(": ${collection.description}")
+            }
+        }
+        
+        // In a real implementation, this would use platform-specific sharing APIs
+        // For now, we could show a snackbar or copy to clipboard
+        println("Sharing collection: $shareText")
     }
 
     /**
@@ -343,5 +526,6 @@ class CollectionsViewModel(
         loadCollectionsJob?.cancel()
         createCollectionJob?.cancel()
         deleteCollectionJob?.cancel()
+        updateCollectionJob?.cancel()
     }
 }

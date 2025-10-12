@@ -33,6 +33,29 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * UI state for the Game screen
+ */
+data class GameUiState(
+    val games: List<Game> = emptyList(),
+    val filteredGames: List<Game> = emptyList(),
+    val availablePlatforms: List<Platform> = emptyList(),
+    val availableGenres: List<Genre> = emptyList(),
+    val searchFilterState: SearchFilterState = SearchFilterState(),
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val isFilterLoading: Boolean = false,
+    val error: String? = null,
+    val filterError: SearchFilterError? = null,
+    val canRetry: Boolean = false,
+    // Collections-related state
+    val collections: List<GameCollection> = emptyList(),
+    val gameCollectionMap: Map<Int, List<CollectionType>> = emptyMap(),
+    val isCollectionsLoading: Boolean = false,
+    val showAddToCollectionDialog: Boolean = false,
+    val selectedGameForCollection: Game? = null
+)
+
 class GameViewModel(
     private val gameRepository: GameRepository,
     private val searchGamesUseCase: SearchGamesUseCase,

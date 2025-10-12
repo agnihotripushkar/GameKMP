@@ -21,7 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Card
@@ -65,6 +67,8 @@ fun CollectionCard(
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onViewDetails: (() -> Unit)? = null,
+    onShare: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     var showDropdownMenu by remember { mutableStateOf(false) }
@@ -180,6 +184,7 @@ fun CollectionCard(
                 onDismissRequest = { showDropdownMenu = false },
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
+                // Edit option - always available
                 DropdownMenuItem(
                     text = {
                         Row(
@@ -199,29 +204,115 @@ fun CollectionCard(
                         onEdit()
                     }
                 )
-                DropdownMenuItem(
-                    text = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.error
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Delete",
-                                color = MaterialTheme.colorScheme.error
-                            )
+                
+                // Delete option - only for custom collections
+                if (collection.type == CollectionType.CUSTOM) {
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Delete",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
+                        onClick = {
+                            showDropdownMenu = false
+                            onDelete()
                         }
-                    },
-                    onClick = {
-                        showDropdownMenu = false
-                        onDelete()
+                    )
+                } else {
+                    // Show disabled delete option for default collections with explanation
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Cannot delete",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text(
+                                        text = "Delete",
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                                    )
+                                    Text(
+                                        text = "Default collections cannot be deleted",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
+                                }
+                            }
+                        },
+                        onClick = {
+                            showDropdownMenu = false
+                            // Still call onDelete to show the protection dialog
+                            onDelete()
+                        },
+                        enabled = false
+                    )
+                }
+                
+                // View Details option - if callback provided
+                onViewDetails?.let { viewDetailsCallback ->
+                    DropdownMenuItem(
+                        text = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "View details",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("View Details")
+                            }
+                        },
+                        onClick = {
+                            showDropdownMenu = false
+                            viewDetailsCallback()
+                        }
+                    )
+                }
+                
+                // Share option - if callback provided and collection has games
+                if (collection.getGameCount() > 0) {
+                    onShare?.let { shareCallback ->
+                        DropdownMenuItem(
+                            text = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = "Share collection",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Share Collection")
+                                }
+                            },
+                            onClick = {
+                                showDropdownMenu = false
+                                shareCallback()
+                            }
+                        )
                     }
-                )
+                }
             }
         }
     }

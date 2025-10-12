@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
@@ -72,7 +73,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
+    onNavigateToCollections: () -> Unit = {}
 ) {
     val viewModel = koinViewModel<GameViewModel>()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -96,6 +98,17 @@ fun GameScreen(
             TopAppBar(
                 title = { Text(text = "Games") },
                 actions = {
+                    // Collections button
+                    IconButton(
+                        onClick = onNavigateToCollections
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Collections,
+                            contentDescription = "View collections",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    
                     // Refresh button
                     IconButton(
                         onClick = { viewModel.refreshGames() },
@@ -475,5 +488,5 @@ fun GameScreen(
 @Preview
 @Composable
 fun GameScreenPreview() {
-    GameScreen(onClick = {})
+    GameScreen(onClick = {}, onNavigateToCollections = {})
 }

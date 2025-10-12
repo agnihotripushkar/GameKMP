@@ -51,6 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devpush.features.game.ui.collections.components.CollectionGrid
 import com.devpush.features.game.ui.collections.components.CreateCollectionDialog
+import com.devpush.features.game.ui.collections.components.EditCollectionDialog
+import com.devpush.features.game.ui.collections.components.DeleteCollectionConfirmationDialog
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -277,7 +279,16 @@ fun CollectionsScreen(
                                     viewModel.startEditingCollection(collection.collection)
                                 },
                                 onDeleteCollection = { collection ->
-                                    viewModel.deleteCollection(collection.id)
+                                    viewModel.showDeleteConfirmation(collection.collection)
+                                },
+                                onViewCollectionDetails = { collection ->
+                                    // Navigate to collection details
+                                    onCollectionClick(collection.collection.id)
+                                },
+                                onShareCollection = { collection ->
+                                    // TODO: Implement sharing functionality
+                                    // For now, this could show a snackbar or dialog
+                                    viewModel.shareCollection(collection.collection)
                                 }
                             )
                         }
@@ -296,10 +307,53 @@ fun CollectionsScreen(
         CreateCollectionDialog(
             onDismiss = { showCreateDialog = false },
             onCreateCollection = { name, type ->
-                viewModel.createCollection(name, type)
+                // For custom collections, we'll use the name as description if needed
+                viewModel.createCollection(name, null)
                 showCreateDialog = false
             }
         )
+    }
+
+    // Edit Collection Dialog
+    uiState.value.editingCollection?.let { collection ->
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            EditCollectionDialog(
+                collection = collection,
+                onDismiss = { 
+                    viewModel.stopEditingCollection()
+                },
+                onUpdateCollection = { name, description ->
+                    viewModel.updateCollection(collection.id, name, description)
+                },
+                isLoading = uiState.value.isUpdating,
+                error = uiState.value.updateError
+            )
+        }
+    }
+
+    // Delete Collection Confirmation Dialog
+    uiState.value.collectionToDelete?.let { collection ->
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            DeleteCollectionConfirmationDialog(
+                collection = collection,
+                onConfirm = { 
+                    viewModel.confirmDeleteCollection()
+                },
+                onDismiss = { 
+                    viewModel.hideDeleteConfirmation()
+                },
+                isDeleting = uiState.value.isDeleting,
+                error = uiState.value.deleteError
+            )
+        }
     }
 }
 

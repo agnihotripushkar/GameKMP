@@ -5,8 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.collections.CollectionError
 import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.repository.GameRepository
-import com.devpush.features.game.domain.repository.GameCollectionRepository
+import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
 import com.devpush.features.game.domain.usecase.AddGameToCollectionUseCase
 import com.devpush.features.game.domain.usecase.RemoveGameFromCollectionUseCase
 import com.devpush.features.game.domain.usecase.UpdateCollectionUseCase
@@ -43,8 +42,8 @@ data class CollectionDetailUiState(
 )
 
 class CollectionDetailViewModel(
-    private val gameCollectionRepository: GameCollectionRepository,
-    private val gameRepository: GameRepository,
+    private val collectionId: String,
+    private val getCollectionsUseCase: GetCollectionsUseCase,
     private val addGameToCollectionUseCase: AddGameToCollectionUseCase,
     private val removeGameFromCollectionUseCase: RemoveGameFromCollectionUseCase,
     private val updateCollectionUseCase: UpdateCollectionUseCase
@@ -60,32 +59,18 @@ class CollectionDetailViewModel(
     private var removeGameJob: Job? = null
     private var updateCollectionJob: Job? = null
     
-    private var currentCollectionId: String? = null
+    init {
+        loadCollection()
+    }
 
     /**
-     * Loads a collection and its games
-     * @param collectionId The ID of the collection to load
+     * Loads the collection and its games
      * @param forceRefresh Whether to bypass cache and fetch fresh data
      */
-    fun loadCollection(collectionId: String, forceRefresh: Boolean = false) {
-        if (currentCollectionId == collectionId && !forceRefresh) {
-            return // Already loaded
-        }
-        
-        currentCollectionId = collectionId
+    fun loadCollection(forceRefresh: Boolean = false) {
         loadCollectionJob?.cancel()
-        loadCollectionJob = flow {
-            // Load collection details and games in parallel
-            val collectionDeferred = async { gameCollectionRepository.getCollectionById(collectionId) }
-            val gamesDeferred = async { gameCollectionRepository.getGamesInCollection(collectionId) }
-            
-            val results = awaitAll(collectionDeferred, gamesDeferred)
-            emit(Pair(results[0] as Result<GameCollection>, results[1] as Result<List<Game>>))
-        }.flowOn(Dispatchers.IO)
-            .catch { exception ->
-                emit(Pair(Result.failure(exception), Result.failure(exception)))
-            }
-            .onStart {
+        loadCollectionJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
                 _uiState.update { 
                     it.copy(
                         isLoading = !forceRefresh,
@@ -93,147 +78,88 @@ class CollectionDetailViewModel(
                         error = null
                     ) 
                 }
-            }
-            .onEach { (collectionResult, gamesResult) ->
-                var error: CollectionError? = null
-                var collection: GameCollection? = null
-                var games: List<Game> = emptyList()
                 
-                collectionResult.onSuccess { loadedCollection ->
-                    collection = loadedCollection
-                }.onFailure { exception ->
-                    error = when (exception) {
-                        is CollectionError -> exception
-                        else -> CollectionError.CollectionNotFound(collectionId)
-                    }
-                }
+                // Get the specific collection by ID
+                val result = getCollectionsUseCase.getCollectionById(collectionId, forceRefresh)
                 
-                if (collection != null) {
-                    gamesResult.onSuccess { loadedGames ->
-                        games = loadedGames
-                    }.onFailure { exception ->
-                        error = when (exception) {
-                            is CollectionError -> exception
-                            else -> CollectionError.UnknownError(
-                                "Failed to load games: ${exception.message}",
-                                exception
-                            )
-                        }
-                    }
-                }
-                
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        collection = collection,
-                        games = games,
-                        isLoading = false,
-                        isRefreshing = false,
-                        error = error
-                    )
-                }
-            }
-            .launchIn(viewModelScope)
-    }
-
-    /**
-     * Refreshes the current collection
-     */
-    fun refreshCollection() {
-        currentCollectionId?.let { collectionId ->
-            loadCollection(collectionId, forceRefresh = true)
-        }
-    }
-
-    /**
-     * Loads available games that can be added to the collection
-     */
-    fun loadAvailableGames() {
-        loadAvailableGamesJob?.cancel()
-        loadAvailableGamesJob = flow {
-            emit(gameRepository.getGames())
-        }.flowOn(Dispatchers.IO)
-            .catch { exception ->
-                emit(Result.failure(exception))
-            }
-            .onStart {
-                _uiState.update { 
-                    it.copy(
-                        isLoadingAvailableGames = true,
-                        error = null
-                    ) 
-                }
-            }
-            .onEach { result ->
-                result.onSuccess { allGames ->
-                    val currentCollection = _uiState.value.collection
-                    val availableGames = if (currentCollection != null) {
-                        // Filter out games already in the collection
-                        allGames.filter { game ->
-                            !currentCollection.containsGame(game.id)
-                        }
-                    } else {
-                        allGames
-                    }
-                    
-                    _uiState.update { 
-                        it.copy(
-                            availableGames = availableGames,
-                            isLoadingAvailableGames = false
+                result.onSuccess { collectionWithCount ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            collection = collectionWithCount.collection,
+                            isLoading = false,
+                            isRefreshing = false,
+                            error = null
                         )
                     }
                 }.onFailure { exception ->
                     val error = when (exception) {
                         is CollectionError -> exception
-                        else -> CollectionError.UnknownError(
-                            "Failed to load available games: ${exception.message}",
-                            exception
-                        )
+                        else -> CollectionError.CollectionNotFound(collectionId)
                     }
                     
-                    _uiState.update { 
-                        it.copy(
-                            isLoadingAvailableGames = false,
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            isRefreshing = false,
                             error = error
                         )
                     }
                 }
+            } catch (exception: Exception) {
+                val error = when (exception) {
+                    is CollectionError -> exception
+                    else -> CollectionError.UnknownError(
+                        "Failed to load collection: ${exception.message}",
+                        exception
+                    )
+                }
+                
+                _uiState.update { 
+                    it.copy(
+                        isLoading = false,
+                        isRefreshing = false,
+                        error = error
+                    ) 
+                }
             }
-            .launchIn(viewModelScope)
+        }
     }
 
     /**
-     * Adds games to the collection
-     * @param gameIds List of game IDs to add
+     * Refreshes the current collection
      */
-    fun addGamesToCollection(gameIds: List<Int>) {
-        val collectionId = _uiState.value.collection?.id ?: return
-        
+    fun refresh() {
+        loadCollection(forceRefresh = true)
+    }
+
+    /**
+     * Loads available games that can be added to the collection
+     * For now, this is a placeholder - in a real implementation, this would
+     * fetch games from a game repository and filter out already added games
+     */
+    fun loadAvailableGames() {
+        // Placeholder implementation - in a real app, this would load from GameRepository
+        _uiState.update { 
+            it.copy(
+                availableGames = emptyList(), // Placeholder
+                isLoadingAvailableGames = false
+            )
+        }
+    }
+
+    /**
+     * Adds a game to the collection
+     * @param gameId The ID of the game to add
+     */
+    fun addGameToCollection(gameId: Int) {
         addGameJob?.cancel()
         addGameJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Add games one by one (could be optimized with batch operation)
-                val results = gameIds.map { gameId ->
-                    async { addGameToCollectionUseCase(collectionId, gameId) }
-                }.awaitAll()
+                val result = addGameToCollectionUseCase(collectionId, gameId)
                 
-                // Check if all operations succeeded
-                val failures = results.filter { it.isFailure }
-                if (failures.isNotEmpty()) {
-                    val error = failures.first().exceptionOrNull()
-                    val collectionError = when (error) {
-                        is CollectionError -> error
-                        else -> CollectionError.UnknownError(
-                            "Failed to add some games: ${error?.message}",
-                            error
-                        )
-                    }
-                    
-                    _uiState.update { 
-                        it.copy(error = collectionError)
-                    }
-                } else {
-                    // Refresh collection to show new games
-                    refreshCollection()
+                result.onSuccess {
+                    // Refresh collection to show new game
+                    refresh()
                     
                     _uiState.update { 
                         it.copy(
@@ -241,10 +167,22 @@ class CollectionDetailViewModel(
                             error = null
                         )
                     }
+                }.onFailure { exception ->
+                    val error = when (exception) {
+                        is CollectionError -> exception
+                        else -> CollectionError.UnknownError(
+                            "Failed to add game: ${exception.message}",
+                            exception
+                        )
+                    }
+                    
+                    _uiState.update { 
+                        it.copy(error = error)
+                    }
                 }
             } catch (exception: Exception) {
                 val error = CollectionError.UnknownError(
-                    "Failed to add games: ${exception.message}",
+                    "Failed to add game: ${exception.message}",
                     exception
                 )
                 
@@ -260,8 +198,6 @@ class CollectionDetailViewModel(
      * @param gameId The ID of the game to remove
      */
     fun removeGameFromCollection(gameId: Int) {
-        val collectionId = _uiState.value.collection?.id ?: return
-        
         removeGameJob?.cancel()
         removeGameJob = viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -269,7 +205,7 @@ class CollectionDetailViewModel(
                 
                 result.onSuccess {
                     // Refresh collection to show updated games
-                    refreshCollection()
+                    refresh()
                     
                     _uiState.update { 
                         it.copy(
@@ -311,13 +247,19 @@ class CollectionDetailViewModel(
 
     /**
      * Updates the collection details
-     * @param updatedCollection The updated collection
+     * @param newName The new name for the collection
+     * @param newDescription The new description for the collection
      */
-    fun updateCollection(updatedCollection: GameCollection) {
+    fun updateCollection(newName: String, newDescription: String?) {
         updateCollectionJob?.cancel()
         updateCollectionJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                val result = updateCollectionUseCase(updatedCollection)
+                val result = updateCollectionUseCase(
+                    collectionId = collectionId,
+                    newName = newName,
+                    newDescription = newDescription,
+                    allowDefaultUpdate = false
+                )
                 
                 result.onSuccess { collection ->
                     _uiState.update { 
@@ -416,9 +358,7 @@ class CollectionDetailViewModel(
         when {
             _uiState.value.error != null -> {
                 clearError()
-                currentCollectionId?.let { collectionId ->
-                    loadCollection(collectionId, forceRefresh = true)
-                }
+                loadCollection(forceRefresh = true)
             }
         }
     }
@@ -433,41 +373,11 @@ class CollectionDetailViewModel(
     }
 
     /**
-     * Gets games filtered by search query
-     * @param query The search query
-     * @return List of games matching the query
-     */
-    fun getFilteredGames(query: String): List<Game> {
-        return if (query.isBlank()) {
-            _uiState.value.games
-        } else {
-            _uiState.value.games.filter { game ->
-                game.name.contains(query, ignoreCase = true)
-            }
-        }
-    }
-
-    /**
-     * Gets available games filtered by search query
-     * @param query The search query
-     * @return List of available games matching the query
-     */
-    fun getFilteredAvailableGames(query: String): List<Game> {
-        return if (query.isBlank()) {
-            _uiState.value.availableGames
-        } else {
-            _uiState.value.availableGames.filter { game ->
-                game.name.contains(query, ignoreCase = true)
-            }
-        }
-    }
-
-    /**
      * Checks if the collection is empty
      * @return true if the collection has no games, false otherwise
      */
     fun isCollectionEmpty(): Boolean {
-        return _uiState.value.games.isEmpty()
+        return _uiState.value.collection?.gameIds?.isEmpty() == true
     }
 
     /**
@@ -475,7 +385,7 @@ class CollectionDetailViewModel(
      * @return The count of games in the collection
      */
     fun getGameCount(): Int {
-        return _uiState.value.games.size
+        return _uiState.value.collection?.gameIds?.size ?: 0
     }
 
     /**
@@ -484,7 +394,7 @@ class CollectionDetailViewModel(
      * @return true if the game is in the collection, false otherwise
      */
     fun isGameInCollection(gameId: Int): Boolean {
-        return _uiState.value.collection?.containsGame(gameId) == true
+        return _uiState.value.collection?.gameIds?.contains(gameId) == true
     }
 
     override fun onCleared() {
