@@ -30,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -74,7 +75,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun GameScreen(
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit,
-    onNavigateToCollections: () -> Unit = {}
+    onNavigateToCollections: () -> Unit = {},
+    onNavigateToStatistics: () -> Unit = {}
 ) {
     val viewModel = koinViewModel<GameViewModel>()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -98,6 +100,17 @@ fun GameScreen(
             TopAppBar(
                 title = { Text(text = "Games") },
                 actions = {
+                    // Statistics button
+                    IconButton(
+                        onClick = onNavigateToStatistics
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BarChart,
+                            contentDescription = "View statistics",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                    
                     // Collections button
                     IconButton(
                         onClick = onNavigateToCollections
@@ -488,5 +501,5 @@ fun GameScreen(
 @Preview
 @Composable
 fun GameScreenPreview() {
-    GameScreen(onClick = {}, onNavigateToCollections = {})
+    GameScreen(onClick = {}, onNavigateToCollections = {}, onNavigateToStatistics = {})
 }

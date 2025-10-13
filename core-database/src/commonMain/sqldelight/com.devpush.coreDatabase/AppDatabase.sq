@@ -294,3 +294,150 @@ SELECT * FROM game_collection
 WHERE name LIKE '%' || ? || '%' 
 ORDER BY name ASC;
 
+-- User Ratings and Reviews Schema
+-- User game ratings table
+CREATE TABLE user_game_rating(
+    game_id INTEGER NOT NULL PRIMARY KEY,
+    rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
+);
+
+-- Performance index for user ratings
+CREATE INDEX IF NOT EXISTS idx_user_game_rating_game_id ON user_game_rating(game_id);
+
+-- User rating operations
+insertUserRating:
+INSERT OR REPLACE INTO user_game_rating(game_id, rating, created_at, updated_at) 
+VALUES(?, ?, ?, ?);
+
+getUserRating:
+SELECT * FROM user_game_rating WHERE game_id = ?;
+
+updateUserRating:
+UPDATE user_game_rating 
+SET rating = ?, updated_at = ? 
+WHERE game_id = ?;
+
+deleteUserRating:
+DELETE FROM user_game_rating WHERE game_id = ?;
+
+getAllUserRatings:
+SELECT * FROM user_game_rating ORDER BY updated_at DESC;
+
+getUserRatingCount:
+SELECT COUNT(*) AS ratingCount FROM user_game_rating;
+
+getUserAverageRating:
+SELECT AVG(CAST(rating AS REAL)) AS averageRating FROM user_game_rating;
+
+getUserRatingDistribution:
+SELECT rating, COUNT(*) AS count 
+FROM user_game_rating 
+GROUP BY rating 
+ORDER BY rating ASC;
+
+-- User game reviews table
+CREATE TABLE user_game_review(
+    game_id INTEGER NOT NULL PRIMARY KEY,
+    review_text TEXT NOT NULL CHECK(length(review_text) <= 1000 AND length(review_text) > 0),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    FOREIGN KEY (game_id) REFERENCES game(id) ON DELETE CASCADE
+);
+
+-- Performance index for user reviews
+CREATE INDEX IF NOT EXISTS idx_user_game_review_game_id ON user_game_review(game_id);
+
+-- User review operations
+insertUserReview:
+INSERT OR REPLACE INTO user_game_review(game_id, review_text, created_at, updated_at) 
+VALUES(?, ?, ?, ?);
+
+getUserReview:
+SELECT * FROM user_game_review WHERE game_id = ?;
+
+updateUserReview:
+UPDATE user_game_review 
+SET review_text = ?, updated_at = ? 
+WHERE game_id = ?;
+
+deleteUserReview:
+DELETE FROM user_game_review WHERE game_id = ?;
+
+getAllUserReviews:
+SELECT * FROM user_game_review ORDER BY updated_at DESC;
+
+getUserReviewCount:
+SELECT COUNT(*) AS reviewCount FROM user_game_review;
+
+getRecentUserReviews:
+SELECT ugr.*, g.name AS game_name, g.image AS game_image 
+FROM user_game_review ugr 
+INNER JOIN game g ON ugr.game_id = g.id 
+ORDER BY ugr.updated_at DESC 
+LIMIT ?;
+
+-- Combined queries for games with user data
+getGameWithUserData:
+SELECT 
+    g.*,
+    ugr.rating AS user_rating,
+    ugr.created_at AS rating_created_at,
+    ugr.updated_at AS rating_updated_at,
+    ugrev.review_text AS user_review,
+    ugrev.created_at AS review_created_at,
+    ugrev.updated_at AS review_updated_at
+FROM game g
+LEFT JOIN user_game_rating ugr ON g.id = ugr.game_id
+LEFT JOIN user_game_review ugrev ON g.id = ugrev.game_id
+WHERE g.id = ?;
+
+getGamesWithUserData:
+SELECT 
+    g.*,
+    ugr.rating AS user_rating,
+    ugr.created_at AS rating_created_at,
+    ugr.updated_at AS rating_updated_at,
+    ugrev.review_text AS user_review,
+    ugrev.created_at AS review_created_at,
+    ugrev.updated_at AS review_updated_at
+FROM game g
+LEFT JOIN user_game_rating ugr ON g.id = ugr.game_id
+LEFT JOIN user_game_review ugrev ON g.id = ugrev.game_id
+WHERE g.id IN ?;
+
+-- Statistics queries
+getUserRatingStats:
+SELECT 
+    (SELECT COUNT(*) FROM user_game_rating) AS total_rated_games,
+    (SELECT COUNT(*) FROM user_game_review) AS total_reviews,
+    (SELECT AVG(CAST(rating AS REAL)) FROM user_game_rating) AS average_rating;
+
+-- Recent activity queries
+getRecentUserActivity:
+SELECT 
+    'rating' AS activity_type,
+    g.id AS game_id,
+    g.name AS game_name,
+    g.image AS game_image,
+    ugr.rating AS rating,
+    NULL AS review_text,
+    ugr.updated_at AS activity_date
+FROM user_game_rating ugr
+INNER JOIN game g ON ugr.game_id = g.id
+UNION ALL
+SELECT 
+    'review' AS activity_type,
+    g.id AS game_id,
+    g.name AS game_name,
+    g.image AS game_image,
+    NULL AS rating,
+    ugrev.review_text AS review_text,
+    ugrev.updated_at AS activity_date
+FROM user_game_review ugrev
+INNER JOIN game g ON ugrev.game_id = g.id
+ORDER BY activity_date DESC
+LIMIT ?;
+

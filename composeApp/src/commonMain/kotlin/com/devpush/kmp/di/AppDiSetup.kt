@@ -10,6 +10,7 @@ import com.devpush.features.game.ui.di.getGameCollectionViewModelModule
 import com.devpush.features.game.ui.di.getGameViewModelModule
 import com.devpush.features.gameDetails.data.di.getGameDetailsModule
 import com.devpush.features.gameDetails.ui.di.getGameDetailsViewModelModule
+import com.devpush.features.userRatingsReviews.di.getUserRatingReviewModule
 import com.devpush.kmp.di.getAppModule
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
@@ -32,6 +33,9 @@ fun intiKoin(koinApplication:((KoinApplication) -> Unit)? = null){
 
             getGameDetailsModule(),
             getGameDetailsViewModelModule(),
+
+            // User Ratings and Reviews modules
+            getUserRatingReviewModule(),
 
             // App modules
             getAppModule(),

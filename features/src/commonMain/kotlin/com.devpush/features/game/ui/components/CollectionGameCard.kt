@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -43,26 +45,37 @@ import coil3.compose.AsyncImage
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.Platform
 import com.devpush.features.game.domain.model.Genre
+import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
+import com.devpush.features.userRatingsReviews.domain.model.UserRating
+import com.devpush.features.userRatingsReviews.domain.model.UserReview
+import com.devpush.features.userRatingsReviews.ui.components.QuickRating
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * Game card component for collection detail view with remove action and game information display.
+ * Enhanced with user rating and review indicators.
  * 
- * @param game The game to display
+ * @param gameWithUserData The game with user data to display
  * @param onClick Callback when the card is clicked to view game details
  * @param onRemove Callback when the remove action is confirmed
  * @param modifier Modifier for styling
  * @param showRemoveButton Whether to show the remove button (default: true)
+ * @param onQuickRating Callback for quick rating action (optional)
+ * @param onReviewPreview Callback when review indicator is tapped (optional)
  */
 @Composable
 fun CollectionGameCard(
-    game: Game,
+    gameWithUserData: GameWithUserData,
     onClick: () -> Unit,
     onRemove: () -> Unit,
     modifier: Modifier = Modifier,
-    showRemoveButton: Boolean = true
+    showRemoveButton: Boolean = true,
+    onQuickRating: ((Int) -> Unit)? = null,
+    onReviewPreview: (() -> Unit)? = null
 ) {
+    val game = gameWithUserData.game
     var showRemoveConfirmation by remember { mutableStateOf(false) }
+    var showQuickRatingDialog by remember { mutableStateOf(false) }
     
     Card(
         modifier = modifier
@@ -97,6 +110,60 @@ fun CollectionGameCard(
                     )
             )
             
+            // User rating badge (top-left corner)
+            if (gameWithUserData.hasUserRating) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "User rating",
+                            tint = Color.White,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            text = gameWithUserData.userRating!!.rating.toString(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+            
+            // Review indicator (top-center)
+            if (gameWithUserData.hasUserReview) {
+                IconButton(
+                    onClick = { onReviewPreview?.invoke() },
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(8.dp)
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(
+                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f)
+                        )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.RateReview,
+                        contentDescription = "View review",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
             // Remove button (top-right corner)
             if (showRemoveButton) {
                 IconButton(
@@ -144,34 +211,47 @@ fun CollectionGameCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Release date
-                    game.releaseDate?.let { releaseDate ->
-                        Text(
-                            text = releaseDate.take(4), // Show only year
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
-                    
-                    // Rating
-                    if (game.rating > 0.0) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Rating",
-                                tint = Color.Yellow,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                    // Release date and external rating
+                    Column {
+                        game.releaseDate?.let { releaseDate ->
                             Text(
-                                text = String.format("%.1f", game.rating),
+                                text = releaseDate.take(4), // Show only year
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontWeight = FontWeight.Medium
+                                color = Color.White.copy(alpha = 0.8f)
                             )
                         }
+                        
+                        // External rating
+                        if (game.rating > 0.0) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.StarBorder,
+                                    contentDescription = "External rating",
+                                    tint = Color.Yellow.copy(alpha = 0.7f),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                Text(
+                                    text = String.format("%.1f", game.rating),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontWeight = FontWeight.Normal
+                                )
+                            }
+                        }
+                    }
+                    
+                    // Quick rating component
+                    if (onQuickRating != null) {
+                        QuickRating(
+                            currentRating = gameWithUserData.userRating?.rating ?: 0,
+                            onRatingChanged = onQuickRating,
+                            showRatingDialog = showQuickRatingDialog,
+                            onShowRatingDialog = { showQuickRatingDialog = true },
+                            onHideRatingDialog = { showQuickRatingDialog = false }
+                        )
                     }
                 }
                 
@@ -261,24 +341,58 @@ private fun RemoveGameConfirmationDialog(
     )
 }
 
+/**
+ * Backward-compatible version of CollectionGameCard for existing code
+ */
+@Composable
+fun CollectionGameCard(
+    game: Game,
+    onClick: () -> Unit,
+    onRemove: () -> Unit,
+    modifier: Modifier = Modifier,
+    showRemoveButton: Boolean = true
+) {
+    CollectionGameCard(
+        gameWithUserData = GameWithUserData(game = game),
+        onClick = onClick,
+        onRemove = onRemove,
+        modifier = modifier,
+        showRemoveButton = showRemoveButton
+    )
+}
+
 @Preview
 @Composable
 fun CollectionGameCardPreview() {
     CollectionGameCard(
-        game = Game(
-            id = 1,
-            name = "Super Mario Bros.",
-            imageUrl = "",
-            platforms = listOf(
-                Platform(1, "Nintendo Switch", "nintendo-switch"),
-                Platform(2, "PC", "pc")
+        gameWithUserData = GameWithUserData(
+            game = Game(
+                id = 1,
+                name = "Super Mario Bros.",
+                imageUrl = "",
+                platforms = listOf(
+                    Platform(1, "Nintendo Switch", "nintendo-switch"),
+                    Platform(2, "PC", "pc")
+                ),
+                genres = listOf(
+                    Genre(1, "Platformer", "platformer"),
+                    Genre(2, "Adventure", "adventure")
+                ),
+                rating = 4.5,
+                releaseDate = "1985-09-13"
             ),
-            genres = listOf(
-                Genre(1, "Platformer", "platformer"),
-                Genre(2, "Adventure", "adventure")
+            userRating = UserRating(
+                gameId = 1,
+                rating = 5,
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
             ),
-            rating = 4.5,
-            releaseDate = "1985-09-13"
+            userReview = UserReview(
+                gameId = 1,
+                reviewText = "Amazing platformer! Brings back childhood memories.",
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            )
         ),
         onClick = {},
         onRemove = {}
@@ -287,25 +401,58 @@ fun CollectionGameCardPreview() {
 
 @Preview
 @Composable
-fun CollectionGameCardNoRemovePreview() {
+fun CollectionGameCardNoUserDataPreview() {
     CollectionGameCard(
-        game = Game(
-            id = 2,
-            name = "The Legend of Zelda: Breath of the Wild",
-            imageUrl = "",
-            platforms = listOf(
-                Platform(1, "Nintendo Switch", "nintendo-switch")
-            ),
-            genres = listOf(
-                Genre(1, "Action", "action"),
-                Genre(2, "Adventure", "adventure"),
-                Genre(3, "RPG", "rpg")
-            ),
-            rating = 4.8,
-            releaseDate = "2017-03-03"
+        gameWithUserData = GameWithUserData(
+            game = Game(
+                id = 2,
+                name = "The Legend of Zelda: Breath of the Wild",
+                imageUrl = "",
+                platforms = listOf(
+                    Platform(1, "Nintendo Switch", "nintendo-switch")
+                ),
+                genres = listOf(
+                    Genre(1, "Action", "action"),
+                    Genre(2, "Adventure", "adventure"),
+                    Genre(3, "RPG", "rpg")
+                ),
+                rating = 4.8,
+                releaseDate = "2017-03-03"
+            )
         ),
         onClick = {},
         onRemove = {},
         showRemoveButton = false
+    )
+}
+
+@Preview
+@Composable
+fun CollectionGameCardUserRatingOnlyPreview() {
+    CollectionGameCard(
+        gameWithUserData = GameWithUserData(
+            game = Game(
+                id = 3,
+                name = "Cyberpunk 2077",
+                imageUrl = "",
+                platforms = listOf(
+                    Platform(1, "PC", "pc")
+                ),
+                genres = listOf(
+                    Genre(1, "RPG", "rpg"),
+                    Genre(2, "Action", "action")
+                ),
+                rating = 3.8,
+                releaseDate = "2020-12-10"
+            ),
+            userRating = UserRating(
+                gameId = 3,
+                rating = 4,
+                createdAt = System.currentTimeMillis(),
+                updatedAt = System.currentTimeMillis()
+            )
+        ),
+        onClick = {},
+        onRemove = {}
     )
 }

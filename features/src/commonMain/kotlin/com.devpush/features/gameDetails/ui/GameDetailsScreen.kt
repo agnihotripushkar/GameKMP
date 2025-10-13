@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -38,6 +39,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +57,11 @@ import com.devpush.features.gameDetails.domain.model.GameDetails
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.collections.CollectionType
 import com.devpush.features.game.ui.components.AddToCollectionDialog
+import com.devpush.features.userRatingsReviews.ui.components.StarRating
+import com.devpush.features.userRatingsReviews.ui.components.ReviewCard
+import com.devpush.features.userRatingsReviews.ui.components.ReviewDialog
+import com.devpush.features.userRatingsReviews.domain.model.UserRating
+import com.devpush.features.userRatingsReviews.domain.model.UserReview
 import kmp.features.generated.resources.Res
 import kmp.features.generated.resources.developers
 import kmp.features.generated.resources.game_count
@@ -84,7 +91,12 @@ fun GameDetailsScreen(modifier: Modifier = Modifier, id: String, onBackClick: ()
         onShowAddToCollectionDialog = { viewModel.showAddToCollectionDialog() },
         onQuickAddToCollection = { collectionType -> viewModel.quickAddToDefaultCollection(collectionType) },
         onAddToCollection = { collection -> viewModel.addToCollection(collection) },
-        onHideAddToCollectionDialog = { viewModel.hideAddToCollectionDialog() }
+        onHideAddToCollectionDialog = { viewModel.hideAddToCollectionDialog() },
+        onRatingChanged = { rating -> viewModel.setUserRating(rating) },
+        onShowReviewDialog = { viewModel.showReviewDialog() },
+        onHideReviewDialog = { viewModel.hideReviewDialog() },
+        onSaveReview = { reviewText -> viewModel.saveUserReview(reviewText) },
+        onDeleteReview = { viewModel.deleteUserReview() }
     )
 }
 
@@ -99,7 +111,12 @@ fun GameDetailsScreenContent(
     onShowAddToCollectionDialog: () -> Unit = {},
     onQuickAddToCollection: (CollectionType) -> Unit = {},
     onAddToCollection: (com.devpush.features.game.domain.model.collections.GameCollection) -> Unit = {},
-    onHideAddToCollectionDialog: () -> Unit = {}
+    onHideAddToCollectionDialog: () -> Unit = {},
+    onRatingChanged: (Int) -> Unit = {},
+    onShowReviewDialog: () -> Unit = {},
+    onHideReviewDialog: () -> Unit = {},
+    onSaveReview: (String) -> Unit = {},
+    onDeleteReview: () -> Unit = {}
 ) {
     if (uiState.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -141,6 +158,27 @@ fun GameDetailsScreenContent(
                         text = data.description, style = MaterialTheme.typography.bodyLarge, // M3: Was body1
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                             .fillMaxWidth()
+                    )
+                }
+
+                // User Rating Section
+                item {
+                    UserRatingSection(
+                        userRating = uiState.userRating,
+                        isLoading = uiState.isRatingLoading,
+                        onRatingChanged = onRatingChanged,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 16.dp)
+                    )
+                }
+
+                // User Review Section
+                item {
+                    UserReviewSection(
+                        userReview = uiState.userReview,
+                        isLoading = uiState.isReviewLoading,
+                        onShowReviewDialog = onShowReviewDialog,
+                        onDeleteReview = onDeleteReview,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                     )
                 }
 
@@ -450,6 +488,17 @@ fun GameDetailsScreenContent(
                 onAddToCollection = onAddToCollection
             )
         }
+        
+        // Review Dialog
+        if (uiState.showReviewDialog) {
+            ReviewDialog(
+                isVisible = true,
+                initialReviewText = uiState.userReview?.reviewText ?: "",
+                onDismiss = onHideReviewDialog,
+                onSave = onSaveReview,
+                isEditing = uiState.userReview != null
+            )
+        }
 
 
     }
@@ -480,6 +529,175 @@ private fun getCollectionTypeColor(type: CollectionType): Color {
         CollectionType.CURRENTLY_PLAYING -> MaterialTheme.colorScheme.secondary
         CollectionType.COMPLETED -> MaterialTheme.colorScheme.tertiary
         CollectionType.CUSTOM -> MaterialTheme.colorScheme.outline
+    }
+}
+
+/**
+ * User Rating Section component
+ */
+@Composable
+private fun UserRatingSection(
+    userRating: UserRating?,
+    isLoading: Boolean,
+    onRatingChanged: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Your Rating",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            if (isLoading) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Saving rating...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    StarRating(
+                        rating = userRating?.rating ?: 0,
+                        onRatingChanged = onRatingChanged,
+                        starSize = 32.dp
+                    )
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    Text(
+                        text = if (userRating != null) {
+                            "${userRating.rating}/5 stars"
+                        } else {
+                            "Tap to rate this game"
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * User Review Section component
+ */
+@Composable
+private fun UserReviewSection(
+    userReview: UserReview?,
+    isLoading: Boolean,
+    onShowReviewDialog: () -> Unit,
+    onDeleteReview: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Your Review",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            if (userReview == null && !isLoading) {
+                OutlinedButton(
+                    onClick = onShowReviewDialog
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.RateReview,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Write Review")
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        when {
+            isLoading -> {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Saving review...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            userReview != null -> {
+                ReviewCard(
+                    review = userReview,
+                    onEditClick = onShowReviewDialog,
+                    onDeleteClick = onDeleteReview
+                )
+            }
+            
+            else -> {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    ),
+                    border = androidx.compose.foundation.BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No review yet. Share your thoughts about this game!",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

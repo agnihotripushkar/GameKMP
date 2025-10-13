@@ -11,6 +11,7 @@ import com.devpush.features.game.ui.GameScreen
 import com.devpush.features.gameDetails.ui.GameDetailsScreen
 import com.devpush.features.game.ui.collections.CollectionsScreen
 import com.devpush.features.game.ui.collections.CollectionDetailScreen
+import com.devpush.features.userRatingsReviews.ui.statistics.StatisticsScreen
 import kotlinx.serialization.Serializable
 
 object GameNavGraph : BaseNavGraph {
@@ -32,6 +33,9 @@ object GameNavGraph : BaseNavGraph {
 
         @Serializable
         data class CollectionDetail(val collectionId: String) : Dest()
+
+        @Serializable
+        data object Statistics : Dest()
     }
 
     override fun build(
@@ -48,6 +52,9 @@ object GameNavGraph : BaseNavGraph {
                     },
                     onNavigateToCollections = {
                         navHostController.navigate(Dest.Collections)
+                    },
+                    onNavigateToStatistics = {
+                        navHostController.navigate(Dest.Statistics)
                     }
                 )
             }
@@ -78,6 +85,18 @@ object GameNavGraph : BaseNavGraph {
                 val args = it.toRoute<Dest.CollectionDetail>()
                 CollectionDetailScreen(
                     collectionId = args.collectionId,
+                    modifier = modifier.fillMaxSize(),
+                    onNavigateBack = {
+                        navHostController.popBackStack()
+                    },
+                    onGameClick = { gameId ->
+                        navHostController.navigate(Dest.Details(gameId))
+                    }
+                )
+            }
+
+            composable<Dest.Statistics> {
+                StatisticsScreen(
                     modifier = modifier.fillMaxSize(),
                     onNavigateBack = {
                         navHostController.popBackStack()

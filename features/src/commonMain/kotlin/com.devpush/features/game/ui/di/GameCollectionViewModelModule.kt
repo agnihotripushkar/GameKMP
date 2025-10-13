@@ -22,7 +22,10 @@ fun getGameCollectionViewModelModule() = module {
             getCollectionsUseCase = get(),
             addGameToCollectionUseCase = get(),
             removeGameFromCollectionUseCase = get(),
-            updateCollectionUseCase = get()
+            updateCollectionUseCase = get(),
+            getGamesWithUserDataUseCase = get(),
+            setUserRatingUseCase = get(),
+            filterCollectionGamesUseCase = get()
         )
     }
 }

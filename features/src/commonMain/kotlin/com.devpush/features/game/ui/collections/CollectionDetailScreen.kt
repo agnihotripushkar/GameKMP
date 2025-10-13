@@ -7,8 +7,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
@@ -64,6 +67,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.devpush.features.game.ui.collections.components.CollectionGameCard
 import com.devpush.features.game.ui.collections.components.AddGamesToCollectionDialog
+import com.devpush.features.game.ui.collections.components.CollectionFilterPanel
+import com.devpush.features.game.ui.components.ReviewPreviewDialog
+import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -116,6 +122,28 @@ fun CollectionDetailScreen(
                     }
                 },
                 actions = {
+                    // Filter button
+                    IconButton(
+                        onClick = { 
+                            if (uiState.value.showFilterPanel) {
+                                viewModel.hideFilterPanel()
+                            } else {
+                                viewModel.showFilterPanel()
+                            }
+                        },
+                        enabled = uiState.value.collection != null
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Filter and sort",
+                            tint = if (uiState.value.filterState.hasActiveFilters()) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            }
+                        )
+                    }
+                    
                     // Edit collection button
                     IconButton(
                         onClick = { viewModel.startEditingCollection() },
@@ -342,10 +370,23 @@ fun CollectionDetailScreen(
                                             )
                                         }
                                         
-                                        Text(
-                                            text = "${uiState.value.games.size} games",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = MaterialTheme.colorScheme.primary
+                                        Column(
+                                            horizontalAlignment = Alignment.End
+                                        ) {
+                                            Text(
+                                                text = "${uiState.value.filteredGamesWithUserData.size} games",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            if (uiState.value.filterState.hasActiveFilters() && 
+                                                uiState.value.filteredGamesWithUserData.size != uiState.value.gamesWithUserData.size) {
+                                                Text(
+                                                    text = "of ${uiState.value.gamesWithUserData.size} total",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
                                         )
                                     }
                                     
@@ -361,9 +402,56 @@ fun CollectionDetailScreen(
                             }
                         }
                         
+                        // Filter panel
+                        AnimatedVisibility(
+                            visible = uiState.value.showFilterPanel,
+                            enter = expandVertically(),
+                            exit = shrinkVertically()
+                        ) {
+                            CollectionFilterPanel(
+                                filterState = uiState.value.filterState,
+                                onFilterStateChanged = { newFilterState ->
+                                    viewModel.updateFilterState(newFilterState)
+                                },
+                                onClearFilters = { viewModel.clearAllFilters() },
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                        
                         // Games grid
                         when {
-                            uiState.value.games.isEmpty() -> {
+                            uiState.value.filteredGamesWithUserData.isEmpty() && uiState.value.gamesWithUserData.isNotEmpty() -> {
+                                // No games match current filters
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
+                                        modifier = Modifier.padding(32.dp)
+                                    ) {
+                                        Text(
+                                            text = "No games match your filters",
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.padding(bottom = 8.dp)
+                                        )
+                                        Text(
+                                            text = "Try adjusting your filters to see more games",
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            modifier = Modifier.padding(bottom = 24.dp)
+                                        )
+                                        TextButton(
+                                            onClick = { viewModel.clearAllFilters() }
+                                        ) {
+                                            Text("Clear Filters")
+                                        }
+                                    }
+                                }
+                            }
+                            uiState.value.gamesWithUserData.isEmpty() -> {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center
@@ -407,12 +495,18 @@ fun CollectionDetailScreen(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     verticalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
-                                    items(uiState.value.games) { game ->
+                                    items(uiState.value.filteredGamesWithUserData) { gameWithUserData ->
                                         CollectionGameCard(
-                                            game = game,
-                                            onGameClick = { onGameClick(game.id) },
-                                            onRemoveFromCollection = {
-                                                viewModel.removeGameFromCollection(game.id)
+                                            gameWithUserData = gameWithUserData,
+                                            onClick = { onGameClick(gameWithUserData.game.id) },
+                                            onRemove = {
+                                                viewModel.removeGameFromCollection(gameWithUserData.game.id)
+                                            },
+                                            onQuickRating = { rating ->
+                                                viewModel.setQuickRating(gameWithUserData.game.id, rating)
+                                            },
+                                            onReviewPreview = {
+                                                viewModel.showReviewPreview(gameWithUserData)
                                             }
                                         )
                                     }
@@ -439,6 +533,18 @@ fun CollectionDetailScreen(
                 showAddGamesDialog = false
             },
             isLoading = uiState.value.isLoadingAvailableGames
+        )
+    }
+    
+    // Review Preview Dialog
+    uiState.value.showReviewPreview?.let { gameWithUserData ->
+        ReviewPreviewDialog(
+            gameWithUserData = gameWithUserData,
+            onDismiss = { viewModel.hideReviewPreview() },
+            onEditReview = {
+                // TODO: Navigate to edit review screen
+                viewModel.hideReviewPreview()
+            }
         )
     }
 }

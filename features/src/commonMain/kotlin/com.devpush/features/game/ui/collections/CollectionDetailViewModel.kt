@@ -9,6 +9,12 @@ import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
 import com.devpush.features.game.domain.usecase.AddGameToCollectionUseCase
 import com.devpush.features.game.domain.usecase.RemoveGameFromCollectionUseCase
 import com.devpush.features.game.domain.usecase.UpdateCollectionUseCase
+import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
+import com.devpush.features.userRatingsReviews.domain.usecase.GetGamesWithUserDataUseCase
+import com.devpush.features.userRatingsReviews.domain.usecase.SetUserRatingUseCase
+import com.devpush.features.game.domain.model.collections.CollectionFilterState
+import com.devpush.features.game.domain.model.collections.CollectionSortOption
+import com.devpush.features.game.domain.usecase.FilterCollectionGamesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -31,14 +37,20 @@ import kotlinx.coroutines.launch
 data class CollectionDetailUiState(
     val collection: GameCollection? = null,
     val games: List<Game> = emptyList(),
+    val gamesWithUserData: List<GameWithUserData> = emptyList(),
+    val filteredGamesWithUserData: List<GameWithUserData> = emptyList(),
     val availableGames: List<Game> = emptyList(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val isLoadingAvailableGames: Boolean = false,
+    val isLoadingUserData: Boolean = false,
     val error: CollectionError? = null,
     val editingCollection: GameCollection? = null,
     val showAddGamesDialog: Boolean = false,
-    val showRemoveConfirmation: Int? = null // Game ID to remove
+    val showRemoveConfirmation: Int? = null, // Game ID to remove
+    val showReviewPreview: GameWithUserData? = null, // Game to show review preview for
+    val filterState: CollectionFilterState = CollectionFilterState(),
+    val showFilterPanel: Boolean = false
 )
 
 class CollectionDetailViewModel(
@@ -46,7 +58,10 @@ class CollectionDetailViewModel(
     private val getCollectionsUseCase: GetCollectionsUseCase,
     private val addGameToCollectionUseCase: AddGameToCollectionUseCase,
     private val removeGameFromCollectionUseCase: RemoveGameFromCollectionUseCase,
-    private val updateCollectionUseCase: UpdateCollectionUseCase
+    private val updateCollectionUseCase: UpdateCollectionUseCase,
+    private val getGamesWithUserDataUseCase: GetGamesWithUserDataUseCase,
+    private val setUserRatingUseCase: SetUserRatingUseCase,
+    private val filterCollectionGamesUseCase: FilterCollectionGamesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CollectionDetailUiState())
@@ -91,6 +106,9 @@ class CollectionDetailViewModel(
                             error = null
                         )
                     }
+                    
+                    // Load user data for games in the collection
+                    loadUserDataForGames(collectionWithCount.collection.gameIds)
                 }.onFailure { exception ->
                     val error = when (exception) {
                         is CollectionError -> exception
@@ -430,6 +448,160 @@ class CollectionDetailViewModel(
      */
     fun isGameInCollection(gameId: Int): Boolean {
         return _uiState.value.collection?.gameIds?.contains(gameId) == true
+    }
+    
+    /**
+     * Loads user data (ratings and reviews) for the given games
+     * @param gameIds List of game IDs to load user data for
+     */
+    private fun loadUserDataForGames(gameIds: List<Int>) {
+        if (gameIds.isEmpty()) {
+            _uiState.update { it.copy(gamesWithUserData = emptyList()) }
+            return
+        }
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _uiState.update { it.copy(isLoadingUserData = true) }
+                
+                val result = getGamesWithUserDataUseCase(gameIds)
+                
+                result.onSuccess { gamesWithUserData ->
+                    _uiState.update { currentState ->
+                        val filteredGames = filterCollectionGamesUseCase(gamesWithUserData, currentState.filterState)
+                        currentState.copy(
+                            gamesWithUserData = gamesWithUserData,
+                            filteredGamesWithUserData = filteredGames,
+                            isLoadingUserData = false
+                        )
+                    }
+                }.onFailure { exception ->
+                    // Don't show error for user data loading failure, just log it
+                    // The collection should still work without user data
+                    _uiState.update { it.copy(isLoadingUserData = false) }
+                }
+            } catch (exception: Exception) {
+                _uiState.update { it.copy(isLoadingUserData = false) }
+            }
+        }
+    }
+    
+    /**
+     * Sets a quick rating for a game
+     * @param gameId The ID of the game to rate
+     * @param rating The rating (1-5 stars)
+     */
+    fun setQuickRating(gameId: Int, rating: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = setUserRatingUseCase(gameId, rating)
+                
+                result.onSuccess {
+                    // Reload user data to reflect the new rating
+                    _uiState.value.collection?.gameIds?.let { gameIds ->
+                        loadUserDataForGames(gameIds)
+                    }
+                }.onFailure { exception ->
+                    // Handle rating error - could show a snackbar or toast
+                    // For now, just ignore the error
+                }
+            } catch (exception: Exception) {
+                // Handle exception
+            }
+        }
+    }
+    
+    /**
+     * Shows the review preview dialog for a game
+     * @param gameWithUserData The game with user data to show review for
+     */
+    fun showReviewPreview(gameWithUserData: GameWithUserData) {
+        _uiState.update { 
+            it.copy(showReviewPreview = gameWithUserData)
+        }
+    }
+    
+    /**
+     * Hides the review preview dialog
+     */
+    fun hideReviewPreview() {
+        _uiState.update { 
+            it.copy(showReviewPreview = null)
+        }
+    }
+    
+    /**
+     * Updates the filter state and applies filtering
+     */
+    fun updateFilterState(newFilterState: CollectionFilterState) {
+        _uiState.update { currentState ->
+            val filteredGames = filterCollectionGamesUseCase(currentState.gamesWithUserData, newFilterState)
+            currentState.copy(
+                filterState = newFilterState,
+                filteredGamesWithUserData = filteredGames
+            )
+        }
+    }
+    
+    /**
+     * Updates the search query
+     */
+    fun updateSearchQuery(query: String) {
+        val newFilterState = _uiState.value.filterState.copy(searchQuery = query)
+        updateFilterState(newFilterState)
+    }
+    
+    /**
+     * Updates the sort option
+     */
+    fun updateSortOption(sortOption: CollectionSortOption) {
+        val newFilterState = _uiState.value.filterState.copy(sortBy = sortOption)
+        updateFilterState(newFilterState)
+    }
+    
+    /**
+     * Sets the user rating filter range
+     */
+    fun setUserRatingFilter(minRating: Int, maxRating: Int) {
+        val newFilterState = _uiState.value.filterState.setUserRatingRange(minRating, maxRating)
+        updateFilterState(newFilterState)
+    }
+    
+    /**
+     * Toggles the "show only rated" filter
+     */
+    fun toggleShowOnlyRated() {
+        val newFilterState = _uiState.value.filterState.toggleShowOnlyRated()
+        updateFilterState(newFilterState)
+    }
+    
+    /**
+     * Toggles the "show only reviewed" filter
+     */
+    fun toggleShowOnlyReviewed() {
+        val newFilterState = _uiState.value.filterState.toggleShowOnlyReviewed()
+        updateFilterState(newFilterState)
+    }
+    
+    /**
+     * Clears all filters
+     */
+    fun clearAllFilters() {
+        updateFilterState(CollectionFilterState())
+    }
+    
+    /**
+     * Shows the filter panel
+     */
+    fun showFilterPanel() {
+        _uiState.update { it.copy(showFilterPanel = true) }
+    }
+    
+    /**
+     * Hides the filter panel
+     */
+    fun hideFilterPanel() {
+        _uiState.update { it.copy(showFilterPanel = false) }
     }
 
     override fun onCleared() {
