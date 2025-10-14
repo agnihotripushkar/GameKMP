@@ -6,6 +6,10 @@ fun List<com.devpush.coreNetwork.model.game.Result>.toDomainListOfGames(): List<
     Game(
         id = it.id,
         name = it.name,
-        imageUrl = it.background_image
+        imageUrl = it.backgroundImage ?: "",
+        platforms = it.platforms.toDomainPlatforms(),
+        genres = it.genres.toDomainGenres(),
+        rating = it.rating,
+        releaseDate = it.releaseDate
     )
 }

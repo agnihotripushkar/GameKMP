@@ -9,6 +9,9 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.devpush.features.game.ui.GameScreen
 import com.devpush.features.gameDetails.ui.GameDetailsScreen
+import com.devpush.features.game.ui.collections.CollectionsScreen
+import com.devpush.features.game.ui.collections.CollectionDetailScreen
+import com.devpush.features.userRatingsReviews.ui.statistics.StatisticsScreen
 import kotlinx.serialization.Serializable
 
 object GameNavGraph : BaseNavGraph {
@@ -24,6 +27,15 @@ object GameNavGraph : BaseNavGraph {
 
         @Serializable
         data class Details(val id: Int) : Dest()
+
+        @Serializable
+        data object Collections : Dest()
+
+        @Serializable
+        data class CollectionDetail(val collectionId: String) : Dest()
+
+        @Serializable
+        data object Statistics : Dest()
     }
 
     override fun build(
@@ -37,7 +49,14 @@ object GameNavGraph : BaseNavGraph {
                     modifier = modifier.fillMaxSize(),
                     onClick = {
                         navHostController.navigate(Dest.Details(it))
-                    })
+                    },
+                    onNavigateToCollections = {
+                        navHostController.navigate(Dest.Collections)
+                    },
+                    onNavigateToStatistics = {
+                        navHostController.navigate(Dest.Statistics)
+                    }
+                )
             }
 
             composable<Dest.Details> {
@@ -48,6 +67,44 @@ object GameNavGraph : BaseNavGraph {
                     onBackClick = {
                         navHostController.popBackStack()
                     })
+            }
+
+            composable<Dest.Collections> {
+                CollectionsScreen(
+                    modifier = modifier.fillMaxSize(),
+                    onCollectionClick = { collectionId ->
+                        navHostController.navigate(Dest.CollectionDetail(collectionId))
+                    },
+                    onNavigateBack = {
+                        navHostController.popBackStack()
+                    }
+                )
+            }
+
+            composable<Dest.CollectionDetail> {
+                val args = it.toRoute<Dest.CollectionDetail>()
+                CollectionDetailScreen(
+                    collectionId = args.collectionId,
+                    modifier = modifier.fillMaxSize(),
+                    onNavigateBack = {
+                        navHostController.popBackStack()
+                    },
+                    onGameClick = { gameId ->
+                        navHostController.navigate(Dest.Details(gameId))
+                    }
+                )
+            }
+
+            composable<Dest.Statistics> {
+                StatisticsScreen(
+                    modifier = modifier.fillMaxSize(),
+                    onNavigateBack = {
+                        navHostController.popBackStack()
+                    },
+                    onGameClick = { gameId ->
+                        navHostController.navigate(Dest.Details(gameId))
+                    }
+                )
             }
         }
     }
