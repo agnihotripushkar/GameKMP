@@ -266,33 +266,29 @@ fun CollectionsScreen(
                 }
                 
                 else -> {
-                    LazyColumn(
+                    // Use CollectionGrid directly instead of nesting it in LazyColumn
+                    // This prevents the nested scrollable component issue
+                    CollectionGrid(
+                        collections = uiState.value.collections,
+                        onCollectionClick = onCollectionClick,
+                        onEditCollection = { collection ->
+                            viewModel.startEditingCollection(collection.collection)
+                        },
+                        onDeleteCollection = { collection ->
+                            viewModel.deleteCollection(collection.id)
+                        },
+                        onViewCollectionDetails = { collection ->
+                            // Navigate to collection details
+                            onCollectionClick(collection.id)
+                        },
+                        onShareCollection = { collection ->
+                            // TODO: Implement sharing functionality
+                            // For now, this could show a snackbar or dialog
+                            viewModel.shareCollection(collection.collection)
+                        },
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        item {
-                            CollectionGrid(
-                                collections = uiState.value.collections,
-                                onCollectionClick = onCollectionClick,
-                                onEditCollection = { collection ->
-                                    viewModel.startEditingCollection(collection.collection)
-                                },
-                                onDeleteCollection = { collection ->
-                                    viewModel.deleteCollection(collection.id)
-                                },
-                                onViewCollectionDetails = { collection ->
-                                    // Navigate to collection details
-                                    onCollectionClick(collection.id)
-                                },
-                                onShareCollection = { collection ->
-                                    // TODO: Implement sharing functionality
-                                    // For now, this could show a snackbar or dialog
-                                    viewModel.shareCollection(collection.collection)
-                                }
-                            )
-                        }
-                    }
+                        contentPadding = PaddingValues(16.dp)
+                    )
                 }
             }
         }

@@ -74,6 +74,7 @@ import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.ui.components.ConstrainedScrollableContainer
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +84,7 @@ fun CollectionDetailScreen(
     onNavigateBack: () -> Unit = {},
     onGameClick: (Int) -> Unit = {}
 ) {
-    val viewModel = koinViewModel<CollectionDetailViewModel>()
+    val viewModel = koinViewModel<CollectionDetailViewModel> { parametersOf(collectionId) }
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
