@@ -143,11 +143,12 @@ fun StatisticsScreen(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 item {
+                                    val stats = uiState.stats
                                     StatisticsCard(
                                         title = "Games Rated",
-                                        value = uiState.stats.totalRatedGames.toString(),
+                                        value = stats?.totalRatedGames?.toString() ?: "0",
                                         icon = Icons.Default.Star,
-                                        subtitle = if (uiState.stats.totalRatedGames > 0) {
+                                        subtitle = if ((stats?.totalRatedGames ?: 0) > 0) {
                                             "Keep rating games!"
                                         } else {
                                             "Start rating games"
@@ -157,11 +158,12 @@ fun StatisticsScreen(
                                 }
                                 
                                 item {
+                                    val stats = uiState.stats
                                     StatisticsCard(
                                         title = "Reviews Written",
-                                        value = uiState.stats.totalReviews.toString(),
+                                        value = stats?.totalReviews?.toString() ?: "0",
                                         icon = Icons.Default.RateReview,
-                                        subtitle = if (uiState.stats.totalReviews > 0) {
+                                        subtitle = if ((stats?.totalReviews ?: 0) > 0) {
                                             "Great insights!"
                                         } else {
                                             "Share your thoughts"
@@ -171,15 +173,16 @@ fun StatisticsScreen(
                                 }
                                 
                                 item {
+                                    val stats = uiState.stats
                                     StatisticsCard(
                                         title = "Average Rating",
-                                        value = if (uiState.stats.totalRatedGames > 0) {
-                                            "${(uiState.stats.averageRating * 10).roundToInt() / 10.0}"
+                                        value = if ((stats?.totalRatedGames ?: 0) > 0) {
+                                            "${((stats?.averageRating ?: 0.0) * 10).roundToInt() / 10.0}"
                                         } else {
                                             "0.0"
                                         },
                                         icon = Icons.Default.TrendingUp,
-                                        subtitle = if (uiState.stats.totalRatedGames > 0) {
+                                        subtitle = if ((stats?.totalRatedGames ?: 0) > 0) {
                                             "out of 5.0 stars"
                                         } else {
                                             "Rate some games first"
@@ -192,10 +195,13 @@ fun StatisticsScreen(
                         
                         // Rating distribution chart
                         item {
-                            RatingDistributionChart(
-                                stats = uiState.stats,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                            val stats = uiState.stats
+                            if (stats != null) {
+                                RatingDistributionChart(
+                                    stats = stats,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                         
                         // Recent activity

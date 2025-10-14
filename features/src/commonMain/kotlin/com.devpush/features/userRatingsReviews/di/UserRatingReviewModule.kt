@@ -23,8 +23,8 @@ fun getUserRatingReviewModule() = module {
     single<UserRatingReviewRepository> { UserRatingReviewRepositoryImpl(get()) }
     
     // Validation
-    single { UserRatingReviewValidator() }
-    single { InputSanitizer() }
+    single { UserRatingReviewValidator }
+    single { InputSanitizer }
     
     // Use Cases
     single { GetGameWithUserDataUseCase(get()) }

@@ -311,7 +311,9 @@ fun GameScreen(
             when {
                 uiState.value.isLoading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -363,7 +365,9 @@ fun GameScreen(
                 
                 uiState.value.error?.isNotBlank() == true -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -407,7 +411,9 @@ fun GameScreen(
                 
                 uiState.value.error.isNullOrBlank() && uiState.value.games.isEmpty() && !uiState.value.isLoading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -443,7 +449,9 @@ fun GameScreen(
                 
                 uiState.value.filteredGames.isEmpty() && uiState.value.searchFilterState.hasActiveFilters() -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -466,9 +474,11 @@ fun GameScreen(
                 }
                 
                 else -> {
-                    // Show filtered games
+                    // Show filtered games - Use weight to provide finite constraints
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
                         contentPadding = PaddingValues(bottom = 16.dp)
                     ) {
                         items(uiState.value.filteredGames) { gameItem ->

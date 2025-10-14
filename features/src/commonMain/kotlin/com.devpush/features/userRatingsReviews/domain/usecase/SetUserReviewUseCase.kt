@@ -3,6 +3,7 @@ package com.devpush.features.userRatingsReviews.domain.usecase
 import com.devpush.features.userRatingsReviews.domain.model.UserRatingReviewError
 import com.devpush.features.userRatingsReviews.domain.repository.UserRatingReviewRepository
 import com.devpush.features.userRatingsReviews.domain.validation.UserRatingReviewValidator
+import com.devpush.features.userRatingsReviews.domain.validation.ValidationResult
 import com.devpush.features.userRatingsReviews.domain.validation.InputSanitizer
 
 /**
@@ -32,8 +33,8 @@ class SetUserReviewUseCase(
             
             // Validate review text using the validator
             val validationResult = validator.validateReviewText(sanitizedReviewText)
-            if (validationResult.isFailure) {
-                return Result.failure(validationResult.exceptionOrNull()!!)
+            if (!validationResult.isValid) {
+                return Result.failure((validationResult as ValidationResult.Error).error)
             }
             
             // Set the review through the repository

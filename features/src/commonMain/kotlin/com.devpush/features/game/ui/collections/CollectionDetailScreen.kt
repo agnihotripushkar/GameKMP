@@ -48,6 +48,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -70,6 +71,7 @@ import com.devpush.features.game.ui.collections.components.AddGamesToCollectionD
 import com.devpush.features.game.ui.collections.components.CollectionFilterPanel
 import com.devpush.features.game.ui.components.ReviewPreviewDialog
 import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
+import com.devpush.features.ui.components.ConstrainedScrollableContainer
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -339,176 +341,180 @@ fun CollectionDetailScreen(
                 }
                 
                 else -> {
-                    Column(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        // Collection info header
-                        uiState.value.collection?.let { collection ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp)
+                    // Use Box with fillMaxSize to provide finite constraints
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            // Collection info header - fixed height content
+                            uiState.value.collection?.let { collection ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                                    Column(
+                                        modifier = Modifier.padding(16.dp)
                                     ) {
-                                        Column {
-                                            Text(
-                                                text = collection.name,
-                                                style = MaterialTheme.typography.headlineSmall,
-                                                color = MaterialTheme.colorScheme.onSurface
-                                            )
-                                            Text(
-                                                text = collection.type.displayName,
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                                            )
-                                        }
-                                        
-                                        Column(
-                                            horizontalAlignment = Alignment.End
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(
-                                                text = "${uiState.value.filteredGamesWithUserData.size} games",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                            if (uiState.value.filterState.hasActiveFilters() && 
-                                                uiState.value.filteredGamesWithUserData.size != uiState.value.gamesWithUserData.size) {
+                                            Column {
                                                 Text(
-                                                    text = "of ${uiState.value.gamesWithUserData.size} total",
-                                                    style = MaterialTheme.typography.bodySmall,
+                                                    text = collection.name,
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                                Text(
+                                                    text = collection.type.displayName,
+                                                    style = MaterialTheme.typography.bodyMedium,
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
+                                            
+                                            Column(
+                                                horizontalAlignment = Alignment.End
+                                            ) {
+                                                Text(
+                                                    text = "${uiState.value.filteredGamesWithUserData.size} games",
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                                if (uiState.value.filterState.hasActiveFilters() && 
+                                                    uiState.value.filteredGamesWithUserData.size != uiState.value.gamesWithUserData.size) {
+                                                    Text(
+                                                        text = "of ${uiState.value.gamesWithUserData.size} total",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+                                            }
                                         }
-                                        )
-                                    }
-                                    
-                                    collection.description?.let { description ->
-                                        Spacer(modifier = Modifier.height(8.dp))
-                                        Text(
-                                            text = description,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Filter panel
-                        AnimatedVisibility(
-                            visible = uiState.value.showFilterPanel,
-                            enter = expandVertically(),
-                            exit = shrinkVertically()
-                        ) {
-                            CollectionFilterPanel(
-                                filterState = uiState.value.filterState,
-                                onFilterStateChanged = { newFilterState ->
-                                    viewModel.updateFilterState(newFilterState)
-                                },
-                                onClearFilters = { viewModel.clearAllFilters() },
-                                modifier = Modifier.padding(horizontal = 16.dp)
-                            )
-                        }
-                        
-                        // Games grid
-                        when {
-                            uiState.value.filteredGamesWithUserData.isEmpty() && uiState.value.gamesWithUserData.isNotEmpty() -> {
-                                // No games match current filters
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center,
-                                        modifier = Modifier.padding(32.dp)
-                                    ) {
-                                        Text(
-                                            text = "No games match your filters",
-                                            style = MaterialTheme.typography.headlineSmall,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.padding(bottom = 8.dp)
-                                        )
-                                        Text(
-                                            text = "Try adjusting your filters to see more games",
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(bottom = 24.dp)
-                                        )
-                                        TextButton(
-                                            onClick = { viewModel.clearAllFilters() }
-                                        ) {
-                                            Text("Clear Filters")
-                                        }
-                                    }
-                                }
-                            }
-                            uiState.value.gamesWithUserData.isEmpty() -> {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Column(
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Center,
-                                        modifier = Modifier.padding(32.dp)
-                                    ) {
-                                        Text(
-                                            text = "No games in this collection",
-                                            style = MaterialTheme.typography.headlineSmall,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.padding(bottom = 8.dp)
-                                        )
-                                        Text(
-                                            text = "Add some games to get started",
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            modifier = Modifier.padding(bottom = 24.dp)
-                                        )
-                                        Button(
-                                            onClick = { showAddGamesDialog = true }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Add,
-                                                contentDescription = null,
-                                                modifier = Modifier.padding(end = 8.dp)
+                                        
+                                        collection.description?.let { description ->
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = description,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
-                                            Text("Add Games")
                                         }
                                     }
                                 }
                             }
                             
-                            else -> {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Adaptive(minSize = 160.dp),
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentPadding = PaddingValues(16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    items(uiState.value.filteredGamesWithUserData) { gameWithUserData ->
-                                        CollectionGameCard(
-                                            gameWithUserData = gameWithUserData,
-                                            onClick = { onGameClick(gameWithUserData.game.id) },
-                                            onRemove = {
-                                                viewModel.removeGameFromCollection(gameWithUserData.game.id)
-                                            },
-                                            onQuickRating = { rating ->
-                                                viewModel.setQuickRating(gameWithUserData.game.id, rating)
-                                            },
-                                            onReviewPreview = {
-                                                viewModel.showReviewPreview(gameWithUserData)
+                            // Filter panel - fixed height content
+                            AnimatedVisibility(
+                                visible = uiState.value.showFilterPanel,
+                                enter = expandVertically(),
+                                exit = shrinkVertically()
+                            ) {
+                                CollectionFilterPanel(
+                                    filterState = uiState.value.filterState,
+                                    onFilterStateChanged = { newFilterState ->
+                                        viewModel.updateFilterState(newFilterState)
+                                    },
+                                    onClearFilters = { viewModel.clearAllFilters() },
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
+                            
+                            // Games grid - use ConstrainedScrollableContainer to prevent infinite height constraints
+                            ConstrainedScrollableContainer(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                fallbackHeight = 400.dp,
+                                enableLogging = true
+                            ) {
+                                when {
+                                    uiState.value.filteredGamesWithUserData.isEmpty() && uiState.value.gamesWithUserData.isNotEmpty() -> {
+                                        // No games match current filters
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center,
+                                                modifier = Modifier.padding(32.dp)
+                                            ) {
+                                                Text(
+                                                    text = "No games match your filters",
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    modifier = Modifier.padding(bottom = 8.dp)
+                                                )
+                                                Text(
+                                                    text = "Try adjusting your filters to see more games",
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    modifier = Modifier.padding(bottom = 24.dp)
+                                                )
+                                                TextButton(
+                                                    onClick = { viewModel.clearAllFilters() }
+                                                ) {
+                                                    Text("Clear Filters")
+                                                }
                                             }
-                                        )
+                                        }
+                                    }
+                                    uiState.value.gamesWithUserData.isEmpty() -> {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Center,
+                                                modifier = Modifier.padding(32.dp)
+                                            ) {
+                                                Text(
+                                                    text = "No games in this collection",
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    modifier = Modifier.padding(bottom = 8.dp)
+                                                )
+                                                Text(
+                                                    text = "Add some games to get started",
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    modifier = Modifier.padding(bottom = 24.dp)
+                                                )
+                                                Button(
+                                                    onClick = { showAddGamesDialog = true }
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Add,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.padding(end = 8.dp)
+                                                    )
+                                                    Text("Add Games")
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    else -> {
+                                        LazyVerticalGrid(
+                                            columns = GridCells.Adaptive(minSize = 160.dp),
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentPadding = PaddingValues(16.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                                        ) {
+                                            items(uiState.value.filteredGamesWithUserData) { gameWithUserData ->
+                                                CollectionGameCard(
+                                                    game = gameWithUserData.game,
+                                                    onGameClick = { onGameClick(gameWithUserData.game.id) },
+                                                    onRemoveFromCollection = {
+                                                        viewModel.removeGameFromCollection(gameWithUserData.game.id)
+                                                    }
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }

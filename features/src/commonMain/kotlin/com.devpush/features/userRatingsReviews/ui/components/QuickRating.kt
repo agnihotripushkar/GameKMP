@@ -246,10 +246,7 @@ private fun QuickRatingDialog(
                                 )
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
-                                    indication = androidx.compose.material.ripple.rememberRipple(
-                                        bounded = true,
-                                        radius = 24.dp
-                                    )
+                                    indication = null
                                 ) {
                                     hapticFeedback.performHapticFeedback(
                                         androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove

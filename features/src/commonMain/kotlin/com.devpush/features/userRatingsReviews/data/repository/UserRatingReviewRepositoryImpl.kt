@@ -10,6 +10,7 @@ import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.userRatingsReviews.domain.model.UserRatingStats
 import com.devpush.features.userRatingsReviews.domain.model.UserRatingReviewError
 import com.devpush.features.userRatingsReviews.domain.validation.UserRatingReviewValidator
+import com.devpush.features.userRatingsReviews.domain.validation.ValidationResult
 import com.devpush.features.userRatingsReviews.domain.validation.InputSanitizer
 import com.devpush.features.userRatingsReviews.data.mappers.createUserRatingFromRow
 import com.devpush.features.userRatingsReviews.data.mappers.createUserReviewFromRow
@@ -45,7 +46,7 @@ class UserRatingReviewRepositoryImpl(
             // Validate input parameters
             val validationResult = UserRatingReviewValidator.validateRating(rating)
             if (!validationResult.isValid) {
-                return Result.failure(validationResult.error!!)
+                return Result.failure((validationResult as ValidationResult.Error).error)
             }
             
             if (gameId <= 0) {
@@ -166,7 +167,7 @@ class UserRatingReviewRepositoryImpl(
             val sanitizedText = InputSanitizer.sanitizeReviewText(reviewText)
             val validationResult = UserRatingReviewValidator.validateReviewText(sanitizedText)
             if (!validationResult.isValid) {
-                return Result.failure(validationResult.error!!)
+                return Result.failure((validationResult as ValidationResult.Error).error)
             }
             
             if (gameId <= 0) {

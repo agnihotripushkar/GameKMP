@@ -3,6 +3,7 @@ package com.devpush.features.userRatingsReviews.domain.usecase
 import com.devpush.features.userRatingsReviews.domain.model.UserRatingReviewError
 import com.devpush.features.userRatingsReviews.domain.repository.UserRatingReviewRepository
 import com.devpush.features.userRatingsReviews.domain.validation.UserRatingReviewValidator
+import com.devpush.features.userRatingsReviews.domain.validation.ValidationResult
 
 /**
  * Use case for setting or updating a user's rating for a game
@@ -27,8 +28,8 @@ class SetUserRatingUseCase(
             
             // Validate rating using the validator
             val validationResult = validator.validateRating(rating)
-            if (validationResult.isFailure) {
-                return Result.failure(validationResult.exceptionOrNull()!!)
+            if (!validationResult.isValid) {
+                return Result.failure((validationResult as ValidationResult.Error).error)
             }
             
             // Set the rating through the repository
