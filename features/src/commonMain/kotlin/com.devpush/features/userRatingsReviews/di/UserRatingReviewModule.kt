@@ -20,7 +20,7 @@ import org.koin.dsl.module
 
 fun getUserRatingReviewModule() = module {
     // Repository
-    single<UserRatingReviewRepository> { UserRatingReviewRepositoryImpl(get()) }
+    single<UserRatingReviewRepository> { UserRatingReviewRepositoryImpl(get(), get()) }
     
     // Validation
     single { UserRatingReviewValidator }

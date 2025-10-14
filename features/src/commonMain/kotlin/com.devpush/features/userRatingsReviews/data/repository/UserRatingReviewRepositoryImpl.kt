@@ -17,6 +17,7 @@ import com.devpush.features.userRatingsReviews.data.mappers.createUserReviewFrom
 import com.devpush.features.userRatingsReviews.data.mappers.createGameWithUserDataFromRow
 import com.devpush.features.userRatingsReviews.data.mappers.createRecentActivityFromRow
 import com.devpush.features.game.domain.model.Game
+import com.devpush.features.game.domain.repository.GameRepository
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
@@ -29,7 +30,8 @@ import kotlinx.datetime.Clock
  * implemented once the SQLDelight classes are properly generated and available.
  */
 class UserRatingReviewRepositoryImpl(
-    private val appDatabase: AppDatabase
+    private val appDatabase: AppDatabase,
+    private val gameRepository: com.devpush.features.game.domain.repository.GameRepository
 ) : UserRatingReviewRepository {
     
     // Thread-safe cache for performance optimization
@@ -308,8 +310,31 @@ class UserRatingReviewRepositoryImpl(
                 return Result.failure(UserRatingReviewError.GameNotFound)
             }
             
-            // TODO: Implement database operations once SQLDelight classes are generated
-            val gamesWithUserData = emptyList<GameWithUserData>() // Placeholder
+            // Get all games from the game repository
+            val allGamesResult = gameRepository.getGames()
+            val allGames = allGamesResult.getOrElse { exception ->
+                return Result.failure(
+                    UserRatingReviewError.UnknownError(
+                        "Failed to load games: ${exception.message}",
+                        exception
+                    )
+                )
+            }
+            
+            // Filter games by the requested IDs
+            val requestedGames = allGames.filter { game -> 
+                validGameIds.contains(game.id) 
+            }
+            
+            // TODO: Load actual user ratings and reviews from database once SQLDelight is implemented
+            // For now, create GameWithUserData objects with null user data
+            val gamesWithUserData = requestedGames.map { game ->
+                GameWithUserData(
+                    game = game,
+                    userRating = null, // TODO: Load from database
+                    userReview = null  // TODO: Load from database
+                )
+            }
             
             Result.success(gamesWithUserData)
         } catch (e: Exception) {
