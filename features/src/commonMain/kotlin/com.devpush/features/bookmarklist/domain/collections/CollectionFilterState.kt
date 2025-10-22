@@ -1,4 +1,4 @@
-package com.devpush.features.game.domain.model.collections
+package com.devpush.features.bookmarklist.domain.collections
 
 import com.devpush.features.game.domain.model.Genre
 import com.devpush.features.game.domain.model.Platform

@@ -1,4 +1,4 @@
-package com.devpush.features.game.ui.collections
+package com.devpush.features.bookmarklist.ui.collections
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -16,16 +16,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,19 +36,15 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.devpush.features.game.ui.collections.components.CollectionGrid
-import com.devpush.features.game.ui.collections.components.CreateCollectionDialog
-import com.devpush.features.game.ui.collections.components.EditCollectionDialog
-import com.devpush.features.game.ui.collections.components.DeleteCollectionConfirmationDialog
+import com.devpush.features.bookmarklist.ui.components.CollectionGrid
+import com.devpush.features.bookmarklist.ui.components.DeleteCollectionConfirmationDialog
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -67,7 +59,6 @@ fun CollectionsScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val pullToRefreshState = rememberPullToRefreshState()
-    var showCreateDialog by remember { mutableStateOf(false) }
 
     // Show snackbar for errors
     LaunchedEffect(uiState.value.error) {
@@ -115,18 +106,6 @@ fun CollectionsScreen(
                 )
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showCreateDialog = true },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Create new collection"
-                )
-            }
-        }
     ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = uiState.value.isRefreshing,
@@ -229,42 +208,6 @@ fun CollectionsScreen(
                     }
                 }
                 
-                uiState.value.collections.isEmpty() && !uiState.value.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(32.dp)
-                        ) {
-                            Text(
-                                text = "No collections yet",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            Text(
-                                text = "Create your first collection to organize your games",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(bottom = 24.dp)
-                            )
-                            Button(
-                                onClick = { showCreateDialog = true }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = null,
-                                    modifier = Modifier.padding(end = 8.dp)
-                                )
-                                Text("Create Collection")
-                            }
-                        }
-                    }
-                }
-                
                 else -> {
                     // Use CollectionGrid directly instead of nesting it in LazyColumn
                     // This prevents the nested scrollable component issue
@@ -291,43 +234,6 @@ fun CollectionsScreen(
                     )
                 }
             }
-        }
-    }
-
-    // Create Collection Dialog
-    AnimatedVisibility(
-        visible = showCreateDialog,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        CreateCollectionDialog(
-            onDismiss = { showCreateDialog = false },
-            onCreateCollection = { name, type ->
-                // For custom collections, we'll use the name as description if needed
-                viewModel.createCollection(name, null)
-                showCreateDialog = false
-            }
-        )
-    }
-
-    // Edit Collection Dialog
-    uiState.value.editingCollection?.let { collection ->
-        AnimatedVisibility(
-            visible = true,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            EditCollectionDialog(
-                collection = collection,
-                onDismiss = { 
-                    viewModel.stopEditingCollection()
-                },
-                onUpdateCollection = { name, description ->
-                    viewModel.updateCollection(collection.id, name, description)
-                },
-                isLoading = uiState.value.isUpdating,
-                error = uiState.value.updateError
-            )
         }
     }
 

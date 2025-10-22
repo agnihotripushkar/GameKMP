@@ -1,8 +1,8 @@
 package com.devpush.features.game.domain.repository
 
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
 
 /**
  * Repository interface for game collection operations

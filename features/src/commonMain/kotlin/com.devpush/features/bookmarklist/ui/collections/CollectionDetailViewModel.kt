@@ -1,10 +1,10 @@
-package com.devpush.features.game.ui.collections
+package com.devpush.features.bookmarklist.ui.collections
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.game.domain.model.collections.CollectionError
-import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionError
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
 import com.devpush.features.game.domain.usecase.AddGameToCollectionUseCase
 import com.devpush.features.game.domain.usecase.RemoveGameFromCollectionUseCase
@@ -12,22 +12,14 @@ import com.devpush.features.game.domain.usecase.UpdateCollectionUseCase
 import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.userRatingsReviews.domain.usecase.GetGamesWithUserDataUseCase
 import com.devpush.features.userRatingsReviews.domain.usecase.SetUserRatingUseCase
-import com.devpush.features.game.domain.model.collections.CollectionFilterState
-import com.devpush.features.game.domain.model.collections.CollectionSortOption
+import com.devpush.features.bookmarklist.domain.collections.CollectionFilterState
+import com.devpush.features.bookmarklist.domain.collections.CollectionSortOption
 import com.devpush.features.game.domain.usecase.FilterCollectionGamesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 

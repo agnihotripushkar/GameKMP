@@ -8,14 +8,13 @@ import com.devpush.features.game.domain.usecase.FilterGamesUseCase
 import com.devpush.features.game.domain.usecase.GetAvailableFiltersUseCase
 import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
 import com.devpush.features.game.domain.usecase.AddGameToCollectionUseCase
-import com.devpush.features.game.domain.usecase.FilterOptions
 import com.devpush.features.game.domain.model.Platform
 import com.devpush.features.game.domain.model.Genre
 import com.devpush.features.game.domain.model.SearchFilterState
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.SearchFilterError
-import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.game.domain.validation.FilterValidator
 import com.devpush.features.game.domain.validation.ValidationResult
 import kotlinx.coroutines.Dispatchers

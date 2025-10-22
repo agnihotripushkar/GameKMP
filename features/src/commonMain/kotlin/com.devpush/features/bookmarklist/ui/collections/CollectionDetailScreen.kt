@@ -1,4 +1,4 @@
-package com.devpush.features.game.ui.collections
+package com.devpush.features.bookmarklist.ui.collections
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -8,8 +8,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,14 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
@@ -39,7 +33,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -66,11 +59,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.devpush.features.game.ui.collections.components.CollectionGameCard
-import com.devpush.features.game.ui.collections.components.AddGamesToCollectionDialog
-import com.devpush.features.game.ui.collections.components.CollectionFilterPanel
+import com.devpush.features.bookmarklist.ui.components.CollectionGameCard
+import com.devpush.features.bookmarklist.ui.components.CollectionFilterPanel
 import com.devpush.features.game.ui.components.ReviewPreviewDialog
-import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.ui.components.ConstrainedScrollableContainer
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
@@ -188,24 +179,7 @@ fun CollectionDetailScreen(
                 )
             )
         },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = uiState.value.collection != null && !uiState.value.isLoading,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                FloatingActionButton(
-                    onClick = { showAddGamesDialog = true },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add games to collection"
-                    )
-                }
-            }
-        }
+
     ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = uiState.value.isRefreshing,
@@ -484,16 +458,7 @@ fun CollectionDetailScreen(
                                                     style = MaterialTheme.typography.bodyMedium,
                                                     modifier = Modifier.padding(bottom = 24.dp)
                                                 )
-                                                Button(
-                                                    onClick = { showAddGamesDialog = true }
-                                                ) {
-                                                    Icon(
-                                                        imageVector = Icons.Default.Add,
-                                                        contentDescription = null,
-                                                        modifier = Modifier.padding(end = 8.dp)
-                                                    )
-                                                    Text("Add Games")
-                                                }
+
                                             }
                                         }
                                     }
@@ -524,23 +489,6 @@ fun CollectionDetailScreen(
                 }
             }
         }
-    }
-
-    // Add Games Dialog
-    AnimatedVisibility(
-        visible = showAddGamesDialog,
-        enter = fadeIn(),
-        exit = fadeOut()
-    ) {
-        AddGamesToCollectionDialog(
-            availableGames = uiState.value.availableGames,
-            onDismiss = { showAddGamesDialog = false },
-            onAddGames = { gameIds ->
-                viewModel.addGamesToCollection(gameIds)
-                showAddGamesDialog = false
-            },
-            isLoading = uiState.value.isLoadingAvailableGames
-        )
     }
     
     // Review Preview Dialog

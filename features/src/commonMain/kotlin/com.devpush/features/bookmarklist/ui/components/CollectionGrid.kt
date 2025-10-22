@@ -1,4 +1,4 @@
-package com.devpush.features.game.ui.collections.components
+package com.devpush.features.bookmarklist.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,12 +26,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.devpush.features.game.domain.model.collections.CollectionError
-import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionError
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.domain.usecase.CollectionWithCount
 import com.devpush.features.game.ui.components.CollectionCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
 
 /**
  * Responsive grid layout component for displaying game collections with loading states, 

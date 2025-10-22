@@ -1,4 +1,4 @@
-package com.devpush.features.game.ui.collections.components
+package com.devpush.features.bookmarklist.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

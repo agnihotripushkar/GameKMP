@@ -1,9 +1,9 @@
 package com.devpush.features.game.domain.usecase
 
-import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.model.collections.CollectionType
-import com.devpush.features.game.domain.model.collections.CollectionError
-import com.devpush.features.game.domain.model.collections.ValidationResult
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.CollectionError
+import com.devpush.features.bookmarklist.domain.collections.ValidationResult
 import com.devpush.features.game.domain.repository.GameCollectionRepository
 
 /**

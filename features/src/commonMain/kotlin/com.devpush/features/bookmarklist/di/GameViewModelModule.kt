@@ -1,4 +1,4 @@
-package com.devpush.features.game.ui.di
+package com.devpush.features.bookmarklist.di
 
 import com.devpush.features.game.ui.GameViewModel
 import org.koin.core.module.dsl.viewModel

@@ -34,10 +34,8 @@ import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SmallFloatingActionButton
@@ -55,7 +53,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.devpush.features.gameDetails.domain.model.GameDetails
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.ui.components.AddToCollectionDialog
 import com.devpush.features.userRatingsReviews.ui.components.StarRating
 import com.devpush.features.userRatingsReviews.ui.components.ReviewCard
@@ -110,7 +109,7 @@ fun GameDetailsScreenContent(
     onBackClick: () -> Unit,
     onShowAddToCollectionDialog: () -> Unit = {},
     onQuickAddToCollection: (CollectionType) -> Unit = {},
-    onAddToCollection: (com.devpush.features.game.domain.model.collections.GameCollection) -> Unit = {},
+    onAddToCollection: (GameCollection) -> Unit = {},
     onHideAddToCollectionDialog: () -> Unit = {},
     onRatingChanged: (Int) -> Unit = {},
     onShowReviewDialog: () -> Unit = {},

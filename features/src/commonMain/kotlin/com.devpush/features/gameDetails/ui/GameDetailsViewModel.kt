@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.devpush.features.gameDetails.domain.repository.GameDetailsRepository
 import com.devpush.features.game.domain.usecase.GetCollectionsUseCase
 import com.devpush.features.game.domain.usecase.AddGameToCollectionUseCase
-import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.userRatingsReviews.domain.usecase.GetGameWithUserDataUseCase
 import com.devpush.features.userRatingsReviews.domain.usecase.SetUserRatingUseCase
 import com.devpush.features.userRatingsReviews.domain.usecase.SetUserReviewUseCase

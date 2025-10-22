@@ -1,9 +1,9 @@
 package com.devpush.kmp.collections
 
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.domain.usecase.*
-import com.devpush.features.game.ui.collections.CollectionsViewModel
-import com.devpush.features.game.ui.collections.CollectionDetailViewModel
+import com.devpush.features.bookmarklist.ui.collections.CollectionsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -264,7 +264,7 @@ private class GetCollectionsUseCaseImpl(
 private class CreateCollectionUseCaseImpl(
     private val repository: FakeGameCollectionRepository
 ) : CreateCollectionUseCase {
-    override suspend fun invoke(name: String, type: CollectionType, description: String?): Result<com.devpush.features.game.domain.model.collections.GameCollection> {
+    override suspend fun invoke(name: String, type: CollectionType, description: String?): Result<GameCollection> {
         return try {
             val id = repository.createCollection(name, description, type)
             val collection = repository.getCollectionById(id)!!
@@ -274,9 +274,9 @@ private class CreateCollectionUseCaseImpl(
         }
     }
     
-    override suspend fun initializeDefaultCollections(): Result<List<com.devpush.features.game.domain.model.collections.GameCollection>> {
+    override suspend fun initializeDefaultCollections(): Result<List<GameCollection>> {
         return try {
-            val collections = mutableListOf<com.devpush.features.game.domain.model.collections.GameCollection>()
+            val collections = mutableListOf<GameCollection>()
             
             if (!repository.collectionExists("Wishlist")) {
                 val id = repository.createCollection("Wishlist", "Games you want to play", CollectionType.WISHLIST)
@@ -308,7 +308,7 @@ private class DeleteCollectionUseCaseImpl(
             repository.deleteCollection(collectionId)
             // Return placeholder deletion info
             Result.success(com.devpush.features.game.domain.usecase.DeletionInfo(
-                collection = com.devpush.features.game.domain.model.collections.GameCollection(
+                collection = GameCollection(
                     id = collectionId,
                     name = "Deleted",
                     type = CollectionType.CUSTOM,
@@ -339,7 +339,7 @@ private class DeleteCollectionUseCaseImpl(
 private class UpdateCollectionUseCaseImpl(
     private val repository: FakeGameCollectionRepository
 ) : UpdateCollectionUseCase {
-    override suspend fun invoke(collectionId: String, newName: String?, newDescription: String?, allowDefaultUpdate: Boolean): Result<com.devpush.features.game.domain.model.collections.GameCollection> {
+    override suspend fun invoke(collectionId: String, newName: String?, newDescription: String?, allowDefaultUpdate: Boolean): Result<GameCollection> {
         return try {
             repository.updateCollection(collectionId, newName, newDescription)
             val collection = repository.getCollectionById(collectionId)!!
@@ -349,7 +349,7 @@ private class UpdateCollectionUseCaseImpl(
         }
     }
     
-    override suspend fun updateCollection(updatedCollection: com.devpush.features.game.domain.model.collections.GameCollection, allowDefaultUpdate: Boolean): Result<com.devpush.features.game.domain.model.collections.GameCollection> {
+    override suspend fun updateCollection(updatedCollection: GameCollection, allowDefaultUpdate: Boolean): Result<GameCollection> {
         TODO("Not implemented for test")
     }
     
@@ -361,7 +361,7 @@ private class UpdateCollectionUseCaseImpl(
 private class InitializeDefaultCollectionsUseCaseImpl(
     private val repository: FakeGameCollectionRepository
 ) : InitializeDefaultCollectionsUseCase {
-    override suspend fun invoke(): Result<List<com.devpush.features.game.domain.model.collections.GameCollection>> {
+    override suspend fun invoke(): Result<List<GameCollection>> {
         return CreateCollectionUseCaseImpl(repository).initializeDefaultCollections()
     }
 }

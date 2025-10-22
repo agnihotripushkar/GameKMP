@@ -2,7 +2,6 @@ package com.devpush.features.game.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,8 +45,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.devpush.features.game.domain.model.collections.CollectionType
-import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.domain.usecase.CollectionWithCount
 import org.jetbrains.compose.ui.tooling.preview.Preview
 

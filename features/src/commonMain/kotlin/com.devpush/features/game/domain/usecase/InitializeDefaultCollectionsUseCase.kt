@@ -1,7 +1,8 @@
 package com.devpush.features.game.domain.usecase
 
-import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.model.collections.CollectionError
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionError
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.game.domain.repository.GameCollectionRepository
 
 /**
@@ -76,7 +77,7 @@ class InitializeDefaultCollectionsUseCaseImpl(
             
             collectionsResult.fold(
                 onSuccess = { collections ->
-                    val defaultTypes = com.devpush.features.game.domain.model.collections.CollectionType.getDefaultTypes()
+                    val defaultTypes = CollectionType.getDefaultTypes()
                     val existingTypes = collections.map { it.type }.toSet()
                     
                     // Check if all default types are present

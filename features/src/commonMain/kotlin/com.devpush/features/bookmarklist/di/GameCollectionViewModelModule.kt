@@ -1,7 +1,7 @@
-package com.devpush.features.game.ui.di
+package com.devpush.features.bookmarklist.di
 
-import com.devpush.features.game.ui.collections.CollectionDetailViewModel
-import com.devpush.features.game.ui.collections.CollectionsViewModel
+import com.devpush.features.bookmarklist.ui.collections.CollectionDetailViewModel
+import com.devpush.features.bookmarklist.ui.collections.CollectionsViewModel
 import org.koin.compose.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

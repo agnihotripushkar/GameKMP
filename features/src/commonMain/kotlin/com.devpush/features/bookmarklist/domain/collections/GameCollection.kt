@@ -1,4 +1,4 @@
-package com.devpush.features.game.domain.model.collections
+package com.devpush.features.bookmarklist.domain.collections
 
 /**
  * Domain model representing a game collection with validation methods

@@ -1,8 +1,8 @@
 package com.devpush.features.gameDetails.ui
 
 import com.devpush.features.gameDetails.domain.model.GameDetails
-import com.devpush.features.game.domain.model.collections.GameCollection
-import com.devpush.features.game.domain.model.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
 

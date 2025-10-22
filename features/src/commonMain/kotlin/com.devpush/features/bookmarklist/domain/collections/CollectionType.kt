@@ -1,4 +1,4 @@
-package com.devpush.features.game.domain.model.collections
+package com.devpush.features.bookmarklist.domain.collections
 
 /**
  * Enum representing different types of game collections

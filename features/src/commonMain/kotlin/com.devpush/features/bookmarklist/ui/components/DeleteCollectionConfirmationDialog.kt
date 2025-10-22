@@ -1,4 +1,4 @@
-package com.devpush.features.game.ui.collections.components
+package com.devpush.features.bookmarklist.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,15 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.devpush.features.game.domain.model.collections.CollectionType
-import com.devpush.features.game.domain.model.collections.GameCollection
+import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.ExperimentalTime
 
 /**
  * Confirmation dialog for deleting collections with protection for default collections
@@ -276,6 +275,7 @@ fun DeleteCollectionConfirmationDialog(
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Preview
 @Composable
 fun DeleteCollectionConfirmationDialogCustomPreview() {
