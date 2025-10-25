@@ -16,6 +16,8 @@ import com.devpush.features.game.domain.validation.ValidationResult
 import com.devpush.features.game.data.cache.OfflineManager
 import com.devpush.features.game.data.cache.OfflineResult
 import com.devpush.features.common.utils.SearchUtils
+import com.devpush.features.common.utils.StringUtils
+import com.devpush.features.common.utils.DateTimeUtils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -50,7 +52,7 @@ class GameRepositoryImpl(
         return cacheMutex.withLock {
             try {
                 // Check if cache is still valid
-                val currentTime = System.currentTimeMillis()
+                val currentTime = DateTimeUtils.getCurrentTimestamp()
                 if (cachedGames != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedGames!!)
                 }
@@ -86,7 +88,7 @@ class GameRepositoryImpl(
             is OfflineResult.Success -> {
                 // Update local cache with offline data
                 cachedGames = cachedResult.data
-                cacheTimestamp = System.currentTimeMillis()
+                cacheTimestamp = DateTimeUtils.getCurrentTimestamp()
                 
                 // Return success but with warning if data is stale
                 Result.success(cachedResult.data)
@@ -205,7 +207,7 @@ class GameRepositoryImpl(
         return try {
             cacheMutex.withLock {
                 // Return cached platforms if available and valid
-                val currentTime = System.currentTimeMillis()
+                val currentTime = DateTimeUtils.getCurrentTimestamp()
                 if (cachedPlatforms != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedPlatforms!!)
                 }
@@ -238,7 +240,7 @@ class GameRepositoryImpl(
         return try {
             cacheMutex.withLock {
                 // Return cached genres if available and valid
-                val currentTime = System.currentTimeMillis()
+                val currentTime = DateTimeUtils.getCurrentTimestamp()
                 if (cachedGenres != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedGenres!!)
                 }
@@ -392,7 +394,8 @@ class GameRepositoryImpl(
             Result.success(Pair(paginatedGames, hasMore))
         } catch (e: Exception) {
             val error = when {
-                e is OutOfMemoryError -> SearchFilterError.MemoryError
+                e.message?.contains("OutOfMemoryError", ignoreCase = true) == true -> SearchFilterError.MemoryError
+                e.message?.contains("memory", ignoreCase = true) == true -> SearchFilterError.MemoryError
                 else -> SearchFilterError.UnknownError(e.message ?: "Pagination failed", e)
             }
             Result.failure(error)

@@ -3,6 +3,8 @@ package com.devpush.features.common.preview
 import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.domain.model.Game
+import com.devpush.features.game.domain.model.Platform
+import com.devpush.features.game.domain.model.Genre
 import com.devpush.features.game.domain.usecase.CollectionWithCount
 import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
@@ -21,13 +23,34 @@ object PreviewData {
     private val oneWeekAgo = currentTime - 604800000L // 7 days ago
     private val oneMonthAgo = currentTime - 2592000000L // 30 days ago
     
+    // Sample Platforms
+    val samplePlatformNintendoSwitch = Platform(1, "Nintendo Switch", "nintendo-switch")
+    val samplePlatformWiiU = Platform(2, "Wii U", "wii-u")
+    val samplePlatformPC = Platform(3, "PC", "pc")
+    val samplePlatformPS5 = Platform(4, "PlayStation 5", "playstation-5")
+    val samplePlatformXboxSeriesX = Platform(5, "Xbox Series X", "xbox-series-x")
+    val samplePlatformPS4 = Platform(6, "PlayStation 4", "playstation-4")
+    val samplePlatformMobile = Platform(7, "Mobile", "mobile")
+    
+    // Sample Genres
+    val sampleGenreAction = Genre(1, "Action", "action")
+    val sampleGenreAdventure = Genre(2, "Adventure", "adventure")
+    val sampleGenreOpenWorld = Genre(3, "Open World", "open-world")
+    val sampleGenrePlatformer = Genre(4, "Platformer", "platformer")
+    val sampleGenreRPG = Genre(5, "RPG", "rpg")
+    val sampleGenreSciFi = Genre(6, "Sci-Fi", "sci-fi")
+    val sampleGenreRoguelike = Genre(7, "Roguelike", "roguelike")
+    val sampleGenreIndie = Genre(8, "Indie", "indie")
+    val sampleGenreSocialDeduction = Genre(9, "Social Deduction", "social-deduction")
+    val sampleGenreMultiplayer = Genre(10, "Multiplayer", "multiplayer")
+
     // Sample Games
     val sampleGame1 = Game(
         id = 1,
         name = "The Legend of Zelda: Breath of the Wild",
         imageUrl = "https://example.com/zelda.jpg",
-        platforms = listOf("Nintendo Switch", "Wii U"),
-        genres = listOf("Action", "Adventure", "Open World"),
+        platforms = listOf(samplePlatformNintendoSwitch, samplePlatformWiiU),
+        genres = listOf(sampleGenreAction, sampleGenreAdventure, sampleGenreOpenWorld),
         rating = 4.8,
         releaseDate = "2017-03-03"
     )
@@ -36,8 +59,8 @@ object PreviewData {
         id = 2,
         name = "Super Mario Odyssey",
         imageUrl = "https://example.com/mario.jpg",
-        platforms = listOf("Nintendo Switch"),
-        genres = listOf("Platformer", "Adventure"),
+        platforms = listOf(samplePlatformNintendoSwitch),
+        genres = listOf(sampleGenrePlatformer, sampleGenreAdventure),
         rating = 4.7,
         releaseDate = "2017-10-27"
     )
@@ -46,8 +69,8 @@ object PreviewData {
         id = 3,
         name = "Cyberpunk 2077",
         imageUrl = "https://example.com/cyberpunk.jpg",
-        platforms = listOf("PC", "PlayStation 5", "Xbox Series X"),
-        genres = listOf("RPG", "Action", "Sci-Fi"),
+        platforms = listOf(samplePlatformPC, samplePlatformPS5, samplePlatformXboxSeriesX),
+        genres = listOf(sampleGenreRPG, sampleGenreAction, sampleGenreSciFi),
         rating = 3.8,
         releaseDate = "2020-12-10"
     )
@@ -56,8 +79,8 @@ object PreviewData {
         id = 4,
         name = "Hades",
         imageUrl = "https://example.com/hades.jpg",
-        platforms = listOf("PC", "Nintendo Switch", "PlayStation 4"),
-        genres = listOf("Roguelike", "Action", "Indie"),
+        platforms = listOf(samplePlatformPC, samplePlatformNintendoSwitch, samplePlatformPS4),
+        genres = listOf(sampleGenreRoguelike, sampleGenreAction, sampleGenreIndie),
         rating = 4.9,
         releaseDate = "2020-09-17"
     )
@@ -66,8 +89,8 @@ object PreviewData {
         id = 5,
         name = "Among Us",
         imageUrl = "https://example.com/amongus.jpg",
-        platforms = listOf("PC", "Mobile", "Nintendo Switch"),
-        genres = listOf("Social Deduction", "Multiplayer"),
+        platforms = listOf(samplePlatformPC, samplePlatformMobile, samplePlatformNintendoSwitch),
+        genres = listOf(sampleGenreSocialDeduction, sampleGenreMultiplayer),
         rating = 4.2,
         releaseDate = "2018-06-15"
     )
@@ -236,14 +259,18 @@ object PreviewData {
     
     // Sample platforms and genres for filters
     val samplePlatforms = listOf(
-        "PC", "PlayStation 5", "PlayStation 4", "Xbox Series X", "Xbox One", 
-        "Nintendo Switch", "Nintendo 3DS", "Mobile", "Wii U"
+        samplePlatformPC, samplePlatformPS5, samplePlatformPS4, samplePlatformXboxSeriesX,
+        Platform(8, "Xbox One", "xbox-one"), samplePlatformNintendoSwitch,
+        Platform(9, "Nintendo 3DS", "nintendo-3ds"), samplePlatformMobile, samplePlatformWiiU
     )
     
     val sampleGenres = listOf(
-        "Action", "Adventure", "RPG", "Strategy", "Simulation", "Sports",
-        "Racing", "Puzzle", "Platformer", "Fighting", "Shooter", "Horror",
-        "Indie", "Roguelike", "Open World", "Sci-Fi", "Fantasy", "Multiplayer"
+        sampleGenreAction, sampleGenreAdventure, sampleGenreRPG, Genre(11, "Strategy", "strategy"),
+        Genre(12, "Simulation", "simulation"), Genre(13, "Sports", "sports"),
+        Genre(14, "Racing", "racing"), Genre(15, "Puzzle", "puzzle"), sampleGenrePlatformer,
+        Genre(16, "Fighting", "fighting"), Genre(17, "Shooter", "shooter"), Genre(18, "Horror", "horror"),
+        sampleGenreIndie, sampleGenreRoguelike, sampleGenreOpenWorld, sampleGenreSciFi,
+        Genre(19, "Fantasy", "fantasy"), sampleGenreMultiplayer
     )
     
     // Collection type mappings for games
