@@ -1,6 +1,8 @@
 package com.devpush.features.game.domain.usecase
 
 import com.devpush.features.game.domain.model.Game
+import com.devpush.features.common.utils.StringUtils
+import com.devpush.features.common.utils.SearchUtils
 
 interface SearchGamesUseCase {
     suspend operator fun invoke(
@@ -18,9 +20,11 @@ class SearchGamesUseCaseImpl : SearchGamesUseCase {
             return games
         }
         
-        val searchQuery = query.trim().lowercase()
+        val searchQuery = query.trim()
         return games.filter { game ->
-            game.name.lowercase().contains(searchQuery)
+            with(SearchUtils) {
+                game.name.containsIgnoreCase(searchQuery)
+            }
         }
     }
 }

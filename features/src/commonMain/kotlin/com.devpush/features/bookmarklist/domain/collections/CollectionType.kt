@@ -1,5 +1,7 @@
 package com.devpush.features.bookmarklist.domain.collections
 
+import com.devpush.features.common.utils.StringUtils
+
 /**
  * Enum representing different types of game collections
  * 
@@ -78,7 +80,7 @@ enum class CollectionType(
          */
         fun findByDisplayName(displayName: String): CollectionType? {
             return values().find { 
-                it.displayName.equals(displayName, ignoreCase = true) 
+                with(StringUtils) { it.displayName.equalsIgnoreCase(displayName) }
             }
         }
         
@@ -106,9 +108,9 @@ enum class CollectionType(
         fun isValidTypeForName(type: CollectionType, name: String): Boolean {
             return when (type) {
                 CUSTOM -> !getDefaultTypes().any { 
-                    it.displayName.equals(name, ignoreCase = true) 
+                    with(StringUtils) { it.displayName.equalsIgnoreCase(name) }
                 }
-                else -> type.displayName.equals(name, ignoreCase = true)
+                else -> with(StringUtils) { type.displayName.equalsIgnoreCase(name) }
             }
         }
     }

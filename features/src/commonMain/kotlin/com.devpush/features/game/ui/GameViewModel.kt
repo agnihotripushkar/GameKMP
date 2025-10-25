@@ -17,6 +17,8 @@ import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.game.domain.validation.FilterValidator
 import com.devpush.features.game.domain.validation.ValidationResult
+import com.devpush.features.common.utils.SearchUtils
+import com.devpush.features.common.utils.StringUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -108,9 +110,9 @@ class GameViewModel(
                     }
                 }.onFailure { exception ->
                     val errorType = when {
-                        exception.message?.contains("network", ignoreCase = true) == true -> 
+                        exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("network") } } == true -> 
                             SearchFilterError.NetworkError
-                        exception.message?.contains("database", ignoreCase = true) == true -> 
+                        exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("database") } } == true -> 
                             SearchFilterError.DatabaseError
                         else -> SearchFilterError.UnknownError(exception.message ?: "Unknown error occurred")
                     }
@@ -329,7 +331,7 @@ class GameViewModel(
                 
                 // First apply search with caching
                 val searchedGames = if (searchFilterState.searchQuery.isNotEmpty()) {
-                    val searchCacheKey = searchFilterState.searchQuery.lowercase()
+                    val searchCacheKey = with(StringUtils) { searchFilterState.searchQuery.toLowerCaseCompat() }
                     searchCache[searchCacheKey] ?: run {
                         val result = searchGamesUseCase(
                             games = currentState.games,
@@ -375,9 +377,9 @@ class GameViewModel(
                 }
             } catch (exception: Exception) {
                 val filterError = when {
-                    exception.message?.contains("validation", ignoreCase = true) == true ->
+                    exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("validation") } } == true ->
                         SearchFilterError.ValidationError("filter criteria")
-                    exception.message?.contains("network", ignoreCase = true) == true ->
+                    exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("network") } } == true ->
                         SearchFilterError.NetworkError
                     else -> SearchFilterError.UnknownError(exception.message ?: "Filter operation failed")
                 }

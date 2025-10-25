@@ -4,6 +4,7 @@ import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.bookmarklist.domain.collections.CollectionError
 import com.devpush.features.game.domain.repository.GameCollectionRepository
+import com.devpush.features.common.utils.StringUtils
 
 /**
  * Use case for retrieving collections with game counts, sorting, and caching
@@ -114,7 +115,7 @@ class GetCollectionsUseCaseImpl(
             val sortedCollections = collectionsWithCounts.sortedWith(
                 compareBy<CollectionWithCount> { !it.type.isDefault }
                     .thenBy { it.type.sortOrder }
-                    .thenBy { it.name.lowercase() }
+                    .thenBy { with(StringUtils) { it.name.toLowerCaseCompat() } }
             )
             
             // Update cache

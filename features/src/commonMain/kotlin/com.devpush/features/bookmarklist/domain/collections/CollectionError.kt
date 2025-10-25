@@ -1,5 +1,7 @@
 package com.devpush.features.bookmarklist.domain.collections
 
+import com.devpush.features.common.utils.StringUtils
+
 /**
  * Comprehensive sealed class representing different types of collection operation errors
  * with specific error messages and recovery suggestions
@@ -50,7 +52,7 @@ sealed class CollectionError : Exception() {
         override val userMessage: String = "Invalid input for $field"
         override val technicalMessage: String = "Validation failed for field: $field - $reason"
         override val canRetry: Boolean = false
-        override val suggestedAction: String = when (field.lowercase()) {
+        override val suggestedAction: String = when (with(StringUtils) { field.toLowerCaseCompat() }) {
             "collection name" -> "Please enter a valid collection name (2-50 characters, no special symbols)"
             "description" -> "Please enter a description with less than 200 characters"
             "game id" -> "Please select a valid game"
@@ -64,7 +66,7 @@ sealed class CollectionError : Exception() {
         override val userMessage: String = "Operation not allowed"
         override val technicalMessage: String = "Collection operation '$operation' failed: $reason"
         override val canRetry: Boolean = false
-        override val suggestedAction: String = when (operation.lowercase()) {
+        override val suggestedAction: String = when (with(StringUtils) { operation.toLowerCaseCompat() }) {
             "delete" -> "Cannot delete this collection. It may be a default collection or contain games"
             "rename" -> "Cannot rename this collection. It may be a default collection"
             "add game" -> "Cannot add this game to the collection"
@@ -95,7 +97,7 @@ sealed class CollectionError : Exception() {
         override val userMessage: String = "Data integrity error"
         override val technicalMessage: String = "Database constraint '$constraint' violated"
         override val canRetry: Boolean = false
-        override val suggestedAction: String = when (constraint.lowercase()) {
+        override val suggestedAction: String = when (with(StringUtils) { constraint.toLowerCaseCompat() }) {
             "foreign key" -> "The referenced game or collection no longer exists"
             "unique" -> "This would create duplicate data"
             "not null" -> "Required information is missing"
@@ -126,7 +128,7 @@ sealed class CollectionError : Exception() {
         override val userMessage: String = "Cannot modify default collection"
         override val technicalMessage: String = "Operation '$operation' not allowed on default collection type: $collectionType"
         override val canRetry: Boolean = false
-        override val suggestedAction: String = when (operation.lowercase()) {
+        override val suggestedAction: String = when (with(StringUtils) { operation.toLowerCaseCompat() }) {
             "delete" -> "Default collections cannot be deleted. You can only remove games from them"
             "rename" -> "Default collections cannot be renamed"
             else -> "This operation is not allowed on default collections"

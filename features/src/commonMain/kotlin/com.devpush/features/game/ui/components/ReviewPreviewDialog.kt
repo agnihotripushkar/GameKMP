@@ -33,9 +33,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.devpush.features.common.utils.DateTimeUtils
 
 /**
  * Dialog component for quickly previewing a user's review
@@ -181,11 +179,10 @@ fun ReviewPreviewDialog(
 }
 
 /**
- * Formats a timestamp to a readable date string
+ * Formats a timestamp to a readable date string using platform-agnostic DateTimeUtils
  */
 private fun formatDate(timestamp: Long): String {
-    val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    return formatter.format(Date(timestamp))
+    return DateTimeUtils.formatTimestamp(timestamp)
 }
 
 @Preview
@@ -205,14 +202,14 @@ fun ReviewPreviewDialogPreview() {
             userRating = UserRating(
                 gameId = 1,
                 rating = 5,
-                createdAt = System.currentTimeMillis() - 86400000, // 1 day ago
-                updatedAt = System.currentTimeMillis()
+                createdAt = DateTimeUtils.getCurrentTimestamp() - 86400000, // 1 day ago
+                updatedAt = DateTimeUtils.getCurrentTimestamp()
             ),
             userReview = UserReview(
                 gameId = 1,
                 reviewText = "This game completely redefined what an open-world adventure could be. The freedom to explore, the physics-based puzzles, and the sheer beauty of Hyrule make this an unforgettable experience. Every mountain peak calls to be climbed, every shrine offers a unique challenge. A masterpiece that will be remembered for years to come.",
-                createdAt = System.currentTimeMillis() - 86400000,
-                updatedAt = System.currentTimeMillis()
+                createdAt = DateTimeUtils.getCurrentTimestamp() - 86400000,
+                updatedAt = DateTimeUtils.getCurrentTimestamp()
             )
         ),
         onDismiss = {},

@@ -1,5 +1,7 @@
 package com.devpush.features.game.domain.model
 
+import com.devpush.features.common.utils.StringUtils
+
 /**
  * Comprehensive sealed class representing different types of search and filter errors
  * with specific error messages and recovery suggestions
@@ -58,7 +60,7 @@ sealed class SearchFilterError : Exception() {
         override val userMessage: String = "Invalid input for $field"
         override val technicalMessage: String = "Validation failed for field: $field - $reason"
         override val canRetry: Boolean = false
-        override val suggestedAction: String = when (field.lowercase()) {
+        override val suggestedAction: String = when (with(StringUtils) { field.toLowerCaseCompat() }) {
             "search query" -> "Please enter a valid search term (at least 2 characters)"
             "rating" -> "Please select a rating between 0 and 5"
             "platform" -> "Please select at least one valid platform"

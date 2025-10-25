@@ -167,7 +167,7 @@ fun CollectionGameCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = String.format("%.1f", game.rating),
+                                text = "${(game.rating * 10).toInt() / 10.0}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontWeight = FontWeight.Medium

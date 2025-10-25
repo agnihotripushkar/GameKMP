@@ -8,6 +8,8 @@ import com.devpush.features.bookmarklist.domain.collections.CollectionError
 import com.devpush.features.game.domain.repository.GameCollectionRepository
 import com.devpush.features.game.data.mappers.toDomain
 import com.devpush.features.game.data.mappers.toDomainCollections
+import com.devpush.features.common.utils.SearchUtils
+import com.devpush.features.common.utils.StringUtils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlin.uuid.ExperimentalUuidApi
@@ -100,10 +102,10 @@ class GameCollectionRepositoryImpl(
             Result.success(collection)
         } catch (e: Exception) {
             when {
-                e.message?.contains("UNIQUE constraint failed", ignoreCase = true) == true -> {
+                e.message?.let { with(SearchUtils) { it.containsIgnoreCase("UNIQUE constraint failed") } } == true -> {
                     Result.failure(CollectionError.CollectionNameExists(name))
                 }
-                e.message?.contains("constraint", ignoreCase = true) == true -> {
+                e.message?.let { with(SearchUtils) { it.containsIgnoreCase("constraint") } } == true -> {
                     Result.failure(CollectionError.DatabaseConstraintError("collection creation"))
                 }
                 else -> {
@@ -207,7 +209,7 @@ class GameCollectionRepositoryImpl(
             Result.success(Unit)
         } catch (e: Exception) {
             when {
-                e.message?.contains("FOREIGN KEY constraint failed", ignoreCase = true) == true -> {
+                e.message?.let { with(SearchUtils) { it.containsIgnoreCase("FOREIGN KEY constraint failed") } } == true -> {
                     Result.failure(CollectionError.DatabaseConstraintError("foreign key"))
                 }
                 else -> {
@@ -327,7 +329,7 @@ class GameCollectionRepositoryImpl(
             Result.success(updatedCollection)
         } catch (e: Exception) {
             when {
-                e.message?.contains("UNIQUE constraint failed", ignoreCase = true) == true -> {
+                e.message?.let { with(SearchUtils) { it.containsIgnoreCase("UNIQUE constraint failed") } } == true -> {
                     Result.failure(CollectionError.CollectionNameExists(collection.name))
                 }
                 else -> {
@@ -441,7 +443,7 @@ class GameCollectionRepositoryImpl(
         return try {
             val collections = appDatabase.appDatabaseQueries.getAllCollections().executeAsList()
             val nameExists = collections.any { collection ->
-                collection.name.equals(name, ignoreCase = true) && collection.id != excludeId
+                with(StringUtils) { collection.name.equalsIgnoreCase(name) } && collection.id != excludeId
             }
             Result.success(nameExists)
         } catch (e: Exception) {
@@ -555,7 +557,7 @@ class GameCollectionRepositoryImpl(
                 sortByType && sortByName -> {
                     collections.sortedWith(
                         compareBy<GameCollection> { it.type.sortOrder }
-                            .thenBy { it.name.lowercase() }
+                            .thenBy { with(StringUtils) { it.name.toLowerCaseCompat() } }
                     )
                 }
                 sortByType -> {
@@ -563,9 +565,9 @@ class GameCollectionRepositoryImpl(
                 }
                 sortByName -> {
                     if (ascending) {
-                        collections.sortedBy { it.name.lowercase() }
+                        collections.sortedBy { with(StringUtils) { it.name.toLowerCaseCompat() } }
                     } else {
-                        collections.sortedByDescending { it.name.lowercase() }
+                        collections.sortedByDescending { with(StringUtils) { it.name.toLowerCaseCompat() } }
                     }
                 }
                 else -> collections

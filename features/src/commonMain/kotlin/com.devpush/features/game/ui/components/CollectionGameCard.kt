@@ -49,6 +49,7 @@ import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
 import com.devpush.features.userRatingsReviews.ui.components.QuickRating
+import com.devpush.features.common.utils.DateTimeUtils
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -234,7 +235,7 @@ fun CollectionGameCard(
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Text(
-                                    text = String.format("%.1f", game.rating),
+                                    text = "${(game.rating * 10).toInt() / 10.0}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontWeight = FontWeight.Normal
@@ -384,14 +385,14 @@ fun CollectionGameCardPreview() {
             userRating = UserRating(
                 gameId = 1,
                 rating = 5,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = DateTimeUtils.getCurrentTimestamp(),
+                updatedAt = DateTimeUtils.getCurrentTimestamp()
             ),
             userReview = UserReview(
                 gameId = 1,
                 reviewText = "Amazing platformer! Brings back childhood memories.",
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = DateTimeUtils.getCurrentTimestamp(),
+                updatedAt = DateTimeUtils.getCurrentTimestamp()
             )
         ),
         onClick = {},
@@ -448,8 +449,8 @@ fun CollectionGameCardUserRatingOnlyPreview() {
             userRating = UserRating(
                 gameId = 3,
                 rating = 4,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = DateTimeUtils.getCurrentTimestamp(),
+                updatedAt = DateTimeUtils.getCurrentTimestamp()
             )
         ),
         onClick = {},

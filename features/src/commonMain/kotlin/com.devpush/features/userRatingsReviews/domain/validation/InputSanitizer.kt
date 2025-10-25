@@ -1,5 +1,7 @@
 package com.devpush.features.userRatingsReviews.domain.validation
 
+import com.devpush.features.common.utils.StringUtils
+
 /**
  * Utility object for sanitizing user input in ratings and reviews
  */
@@ -73,7 +75,7 @@ object InputSanitizer {
     fun hasTextVariety(text: String): Boolean {
         if (text.length < 3) return true
         
-        val cleanText = text.replace(Regex("\\s+"), "").lowercase()
+        val cleanText = with(StringUtils) { text.replace(Regex("\\s+"), "").toLowerCaseCompat() }
         if (cleanText.isEmpty()) return false
         
         // Check if more than 70% of characters are the same

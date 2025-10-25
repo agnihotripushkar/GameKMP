@@ -53,6 +53,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
 
             implementation(libs.koin.core)
+            implementation(libs.kotlinx.datetime)
 
 
         }

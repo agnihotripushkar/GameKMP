@@ -27,9 +27,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.devpush.features.userRatingsReviews.domain.repository.ActivityType
 import com.devpush.features.userRatingsReviews.domain.repository.RecentActivity
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.devpush.features.common.utils.DateTimeUtils
 
 /**
  * Component for displaying recent user activity (ratings and reviews)
@@ -162,11 +160,8 @@ private fun RecentActivityItem(
         Column(
             horizontalAlignment = Alignment.End
         ) {
-            val date = Instant.fromEpochMilliseconds(activity.activityDate)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-            
             Text(
-                text = "${date.monthNumber}/${date.dayOfMonth}",
+                text = DateTimeUtils.formatRelativeDate(activity.activityDate),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

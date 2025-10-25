@@ -18,6 +18,7 @@ import com.devpush.features.userRatingsReviews.data.mappers.createGameWithUserDa
 import com.devpush.features.userRatingsReviews.data.mappers.createRecentActivityFromRow
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.repository.GameRepository
+import com.devpush.features.common.utils.SearchUtils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
@@ -379,27 +380,27 @@ class UserRatingReviewRepositoryImpl(
     
     private fun <T> handleDatabaseException(exception: Exception): Result<T> {
         return when {
-            exception.message?.contains("FOREIGN KEY constraint failed", ignoreCase = true) == true -> {
+            exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("FOREIGN KEY constraint failed") } } == true -> {
                 Result.failure(UserRatingReviewError.GameNotFound)
             }
-            exception.message?.contains("CHECK constraint failed", ignoreCase = true) == true -> {
+            exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("CHECK constraint failed") } } == true -> {
                 when {
-                    exception.message?.contains("rating", ignoreCase = true) == true -> {
+                    exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("rating") } } == true -> {
                         Result.failure(UserRatingReviewError.InvalidRating(0))
                     }
-                    exception.message?.contains("review_text", ignoreCase = true) == true -> {
+                    exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("review_text") } } == true -> {
                         Result.failure(UserRatingReviewError.ReviewTooLong(0))
                     }
                     else -> Result.failure(UserRatingReviewError.DatabaseError)
                 }
             }
-            exception.message?.contains("UNIQUE constraint failed", ignoreCase = true) == true -> {
+            exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("UNIQUE constraint failed") } } == true -> {
                 Result.failure(UserRatingReviewError.DatabaseError)
             }
-            exception.message?.contains("database", ignoreCase = true) == true -> {
+            exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("database") } } == true -> {
                 Result.failure(UserRatingReviewError.DatabaseError)
             }
-            exception.message?.contains("network", ignoreCase = true) == true -> {
+            exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("network") } } == true -> {
                 Result.failure(UserRatingReviewError.NetworkError)
             }
             else -> {

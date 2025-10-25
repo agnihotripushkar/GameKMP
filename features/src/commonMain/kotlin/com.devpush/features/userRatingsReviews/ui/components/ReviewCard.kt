@@ -26,9 +26,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.devpush.features.common.utils.DateTimeUtils
+import com.devpush.features.common.preview.PreviewData
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * A card component for displaying user reviews with edit and delete options.
@@ -51,7 +51,7 @@ fun ReviewCard(
         modifier = modifier
             .fillMaxWidth()
             .semantics {
-                contentDescription = "Review: ${review.reviewText}. Created on ${formatTimestamp(review.createdAt)}"
+                contentDescription = "Review: ${review.reviewText}. Created on ${DateTimeUtils.formatTimestamp(review.createdAt)}"
             },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -71,7 +71,7 @@ fun ReviewCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = formatTimestamp(review.createdAt),
+                    text = DateTimeUtils.formatTimestamp(review.createdAt),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -120,7 +120,7 @@ fun ReviewCard(
             if (review.updatedAt != review.createdAt) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Updated ${formatTimestamp(review.updatedAt)}",
+                    text = "Updated ${DateTimeUtils.formatTimestamp(review.updatedAt)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -148,13 +148,33 @@ fun CompactReviewCard(
     )
 }
 
-/**
- * Formats a timestamp for display
- */
-private fun formatTimestamp(timestamp: Long): String {
-    val instant = Instant.fromEpochMilliseconds(timestamp)
-    val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    
-    return "${localDateTime.month.name.lowercase().replaceFirstChar { it.uppercase() }} " +
-            "${localDateTime.dayOfMonth}, ${localDateTime.year}"
+@Preview
+@Composable
+fun ReviewCardPreview() {
+    ReviewCard(
+        review = PreviewData.sampleReview1,
+        onEditClick = {},
+        onDeleteClick = {}
+    )
 }
+
+@Preview
+@Composable
+fun ReviewCardShortPreview() {
+    ReviewCard(
+        review = PreviewData.sampleReviewShort,
+        onEditClick = {},
+        onDeleteClick = {}
+    )
+}
+
+@Preview
+@Composable
+fun CompactReviewCardPreview() {
+    CompactReviewCard(
+        review = PreviewData.sampleReview1,
+        onEditClick = {},
+        onDeleteClick = {}
+    )
+}
+

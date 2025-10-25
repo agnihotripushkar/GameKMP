@@ -15,6 +15,7 @@ import com.devpush.features.game.domain.validation.FilterValidator
 import com.devpush.features.game.domain.validation.ValidationResult
 import com.devpush.features.game.data.cache.OfflineManager
 import com.devpush.features.game.data.cache.OfflineResult
+import com.devpush.features.common.utils.SearchUtils
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -99,11 +100,11 @@ class GameRepositoryImpl(
     
     private fun determineNetworkError(exception: Throwable?): SearchFilterError {
         return when {
-            exception?.message?.contains("timeout", ignoreCase = true) == true -> 
+            exception?.message?.let { with(SearchUtils) { it.containsIgnoreCase("timeout") } } == true -> 
                 SearchFilterError.TimeoutError
-            exception?.message?.contains("server", ignoreCase = true) == true -> 
+            exception?.message?.let { with(SearchUtils) { it.containsIgnoreCase("server") } } == true -> 
                 SearchFilterError.ServerError
-            exception?.message?.contains("network", ignoreCase = true) == true -> 
+            exception?.message?.let { with(SearchUtils) { it.containsIgnoreCase("network") } } == true -> 
                 SearchFilterError.NetworkError
             else -> SearchFilterError.UnknownError(
                 exception?.message ?: "Network request failed",
@@ -162,9 +163,9 @@ class GameRepositoryImpl(
             Result.success(filteredGames)
         } catch (e: Exception) {
             val error = when {
-                e.message?.contains("memory", ignoreCase = true) == true -> 
+                e.message?.let { with(SearchUtils) { it.containsIgnoreCase("memory") } } == true -> 
                     SearchFilterError.MemoryError
-                e.message?.contains("timeout", ignoreCase = true) == true -> 
+                e.message?.let { with(SearchUtils) { it.containsIgnoreCase("timeout") } } == true -> 
                     SearchFilterError.PerformanceError
                 else -> SearchFilterError.SearchProcessingError
             }
@@ -177,7 +178,7 @@ class GameRepositoryImpl(
             getGames()
         } else {
             // Performance optimization: Check search cache first
-            val normalizedQuery = query.trim().lowercase()
+            val normalizedQuery = with(StringUtils) { query.trim().toLowerCaseCompat() }
             cacheMutex.withLock {
                 searchCache[normalizedQuery]?.let { cachedResult ->
                     return Result.success(cachedResult)
@@ -281,7 +282,7 @@ class GameRepositoryImpl(
                 // Apply search filter first (most selective)
                 if (searchFilterState.hasActiveSearch()) {
                     sequence.filter { game ->
-                        game.name.contains(searchFilterState.searchQuery, ignoreCase = true)
+                        with(SearchUtils) { game.name.containsIgnoreCase(searchFilterState.searchQuery) }
                     }
                 } else sequence
             }
