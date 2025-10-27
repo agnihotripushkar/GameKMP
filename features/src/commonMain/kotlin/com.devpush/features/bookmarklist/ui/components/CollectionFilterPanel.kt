@@ -29,10 +29,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import com.devpush.features.ui.components.ExpressiveOutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.devpush.features.ui.components.ExpressiveTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -95,7 +95,10 @@ fun CollectionFilterPanel(
                 }
                 
                 if (filterState.hasActiveFilters()) {
-                    TextButton(onClick = onClearFilters) {
+                    ExpressiveTextButton(
+                        onClick = onClearFilters,
+                        contentDescription = "Clear all collection filters"
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Clear,
                             contentDescription = null,
@@ -110,14 +113,15 @@ fun CollectionFilterPanel(
             Spacer(modifier = Modifier.height(16.dp))
             
             // Search
-            OutlinedTextField(
+            ExpressiveOutlinedTextField(
                 value = filterState.searchQuery,
                 onValueChange = { query ->
                     onFilterStateChanged(filterState.copy(searchQuery = query))
                 },
                 label = { Text("Search games") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                contentDescription = "Search games in collection"
             )
             
             Spacer(modifier = Modifier.height(16.dp))

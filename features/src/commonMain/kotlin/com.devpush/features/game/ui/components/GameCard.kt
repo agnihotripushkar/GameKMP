@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -39,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.ui.components.ExpressiveCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.common.utils.StringUtils
 
@@ -61,12 +61,12 @@ fun GameCard(
     onAddToCollection: ((Game) -> Unit)? = null,
     collectionsContainingGame: List<CollectionType> = emptyList()
 ) {
-    Card(
+    ExpressiveCard(
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(350.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp)
+            .height(350.dp),
+        contentDescription = "Game card for ${gameItem.name}"
     ) {
         Box(Modifier.fillMaxSize()) {
             AsyncImage(

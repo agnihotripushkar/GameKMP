@@ -17,11 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -37,11 +38,12 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +63,9 @@ import com.devpush.features.userRatingsReviews.ui.components.ReviewCard
 import com.devpush.features.userRatingsReviews.ui.components.ReviewDialog
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
+import com.devpush.features.ui.components.ExpressiveFABMenu
+import com.devpush.features.ui.components.ExpressiveCard
+import kotlinx.coroutines.launch
 import kmp.features.generated.resources.Res
 import kmp.features.generated.resources.developers
 import kmp.features.generated.resources.game_count
@@ -95,7 +100,11 @@ fun GameDetailsScreen(modifier: Modifier = Modifier, id: String, onBackClick: ()
         onShowReviewDialog = { viewModel.showReviewDialog() },
         onHideReviewDialog = { viewModel.hideReviewDialog() },
         onSaveReview = { reviewText -> viewModel.saveUserReview(reviewText) },
-        onDeleteReview = { viewModel.deleteUserReview() }
+        onDeleteReview = { viewModel.deleteUserReview() },
+        onFABMenuExpandedChange = { expanded -> viewModel.setFABMenuExpanded(expanded) },
+        onShareGame = { viewModel.shareGame() },
+        onClearRatingFocus = { viewModel.clearRatingFocus() },
+        onRateGame = { viewModel.focusOnRating() }
     )
 }
 
@@ -115,7 +124,11 @@ fun GameDetailsScreenContent(
     onShowReviewDialog: () -> Unit = {},
     onHideReviewDialog: () -> Unit = {},
     onSaveReview: (String) -> Unit = {},
-    onDeleteReview: () -> Unit = {}
+    onDeleteReview: () -> Unit = {},
+    onFABMenuExpandedChange: (Boolean) -> Unit = {},
+    onShareGame: () -> Unit = {},
+    onClearRatingFocus: () -> Unit = {},
+    onRateGame: () -> Unit = {}
 ) {
     if (uiState.isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -131,9 +144,26 @@ fun GameDetailsScreenContent(
 
 
     uiState.data?.let { data ->
+        val listState = rememberLazyListState()
+        val coroutineScope = rememberCoroutineScope()
+        
+        // Handle rating focus request
+        LaunchedEffect(uiState.shouldFocusRating) {
+            if (uiState.shouldFocusRating) {
+                // Scroll to the rating section (item index 3: image, title, description, rating)
+                coroutineScope.launch {
+                    listState.animateScrollToItem(3)
+                    // Clear the focus flag after scrolling
+                    onClearRatingFocus()
+                }
+            }
+        }
+        
         Box(modifier.fillMaxSize()) {
-            LazyColumn(modifier = Modifier.fillMaxSize())
-            {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = listState
+            ) {
 
                 item {
                     AsyncImage(
@@ -192,10 +222,9 @@ fun GameDetailsScreenContent(
 
                         LazyRow(modifier = Modifier.fillMaxWidth()) {
                             items(data.platforms) { 
-                                Card(
+                                ExpressiveCard(
                                     modifier = Modifier.padding(12.dp).wrapContentSize(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp) // M3 elevation
+                                    contentDescription = "Platform: ${it.name}"
                                 ) {
                                     Column(
                                         modifier = Modifier.width(150.dp),
@@ -418,53 +447,27 @@ fun GameDetailsScreenContent(
                 }
             }
             
-            // Collection management buttons (bottom-right)
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Quick add to default collections
-                CollectionType.getDefaultTypes().forEach { collectionType ->
-                    val isInCollection = uiState.gameCollectionTypes.contains(collectionType)
-                    
-                    SmallFloatingActionButton(
-                        onClick = { onQuickAddToCollection(collectionType) },
-                        containerColor = if (isInCollection) {
-                            getCollectionTypeColor(collectionType)
-                        } else {
-                            MaterialTheme.colorScheme.surface
-                        },
-                        contentColor = if (isInCollection) {
-                            Color.White
-                        } else {
-                            getCollectionTypeColor(collectionType)
-                        }
-                    ) {
-                        Icon(
-                            imageVector = if (isInCollection) Icons.Default.Check else getCollectionTypeIcon(collectionType),
-                            contentDescription = collectionType.displayName,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                }
-                
-                // Add to Collection button
-                ExtendedFloatingActionButton(
-                    onClick = onShowAddToCollectionDialog,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add to collection",
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Collections")
-                }
-            }
+            // Expressive FAB Menu positioned at bottom-right
+            ExpressiveFABMenu(
+                isExpanded = uiState.isFABMenuExpanded,
+                onExpandedChange = onFABMenuExpandedChange,
+                onAddToCollection = {
+                    onShowAddToCollectionDialog()
+                    onFABMenuExpandedChange(false)
+                },
+                onRateGame = {
+                    // Focus on rating component and collapse FAB menu
+                    onRateGame()
+                },
+                onWriteReview = {
+                    onShowReviewDialog()
+                    onFABMenuExpandedChange(false)
+                },
+                onShareGame = {
+                    onShareGame()
+                },
+                modifier = Modifier.align(Alignment.BottomEnd)
+            )
 
         }
         
@@ -541,13 +544,12 @@ private fun UserRatingSection(
     onRatingChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    ExpressiveCard(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        ),
+        contentDescription = "User rating section"
     ) {
         Column(
             modifier = Modifier
@@ -628,8 +630,9 @@ private fun UserReviewSection(
             )
             
             if (userReview == null && !isLoading) {
-                OutlinedButton(
-                    onClick = onShowReviewDialog
+                ExpressiveOutlinedButton(
+                    onClick = onShowReviewDialog,
+                    contentDescription = "Write a review for this game"
                 ) {
                     Icon(
                         imageVector = Icons.Default.RateReview,
@@ -671,16 +674,16 @@ private fun UserReviewSection(
             }
             
             else -> {
-                Card(
+                ExpressiveCard(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     ),
                     border = androidx.compose.foundation.BorderStroke(
                         1.dp,
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
-                    )
+                    ),
+                    contentDescription = "Empty review placeholder"
                 ) {
                     Box(
                         modifier = Modifier

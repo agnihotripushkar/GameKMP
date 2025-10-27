@@ -25,7 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.devpush.features.ui.components.ExpressiveTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -245,8 +245,9 @@ private fun RemoveGameConfirmationDialog(
             )
         },
         confirmButton = {
-            TextButton(
-                onClick = onConfirm
+            ExpressiveTextButton(
+                onClick = onConfirm,
+                contentDescription = "Confirm remove game from collection"
             ) {
                 Text(
                     text = "Remove",
@@ -255,7 +256,10 @@ private fun RemoveGameConfirmationDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            ExpressiveTextButton(
+                onClick = onDismiss,
+                contentDescription = "Cancel remove game action"
+            ) {
                 Text("Cancel")
             }
         }

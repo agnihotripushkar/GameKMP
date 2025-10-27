@@ -14,7 +14,8 @@ fun getGameDetailsViewModelModule() = module {
             setUserRatingUseCase = get(),
             setUserReviewUseCase = get(),
             deleteUserRatingUseCase = get(),
-            deleteUserReviewUseCase = get()
+            deleteUserReviewUseCase = get(),
+            shareManager = get()
         ) 
     }
 }

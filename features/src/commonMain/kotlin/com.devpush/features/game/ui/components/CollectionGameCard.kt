@@ -21,13 +21,12 @@ import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.devpush.features.ui.components.ExpressiveTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +48,7 @@ import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
 import com.devpush.features.userRatingsReviews.ui.components.QuickRating
+import com.devpush.features.ui.components.ExpressiveCard
 import com.devpush.features.common.utils.DateTimeUtils
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -78,13 +78,12 @@ fun CollectionGameCard(
     var showRemoveConfirmation by remember { mutableStateOf(false) }
     var showQuickRatingDialog by remember { mutableStateOf(false) }
     
-    Card(
+    ExpressiveCard(
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .height(200.dp),
+        contentDescription = "Collection game card for ${game.name}"
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Game image background
@@ -325,8 +324,9 @@ private fun RemoveGameConfirmationDialog(
             )
         },
         confirmButton = {
-            TextButton(
-                onClick = onConfirm
+            ExpressiveTextButton(
+                onClick = onConfirm,
+                contentDescription = "Confirm remove game from collection"
             ) {
                 Text(
                     text = "Remove",
@@ -335,7 +335,10 @@ private fun RemoveGameConfirmationDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            ExpressiveTextButton(
+                onClick = onDismiss,
+                contentDescription = "Cancel remove game action"
+            ) {
                 Text("Cancel")
             }
         }

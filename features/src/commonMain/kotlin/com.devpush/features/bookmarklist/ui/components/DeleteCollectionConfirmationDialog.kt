@@ -19,7 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -238,9 +238,10 @@ fun DeleteCollectionConfirmationDialog(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedButton(
+                    ExpressiveOutlinedButton(
                         onClick = onDismiss,
-                        enabled = !isDeleting
+                        enabled = !isDeleting,
+                        contentDescription = if (isDefaultCollection) "Acknowledge protection message" else "Cancel delete collection"
                     ) {
                         Text(if (isDefaultCollection) "OK" else "Cancel")
                     }

@@ -12,6 +12,8 @@ import com.devpush.features.userRatingsReviews.domain.usecase.SetUserRatingUseCa
 import com.devpush.features.userRatingsReviews.domain.usecase.SetUserReviewUseCase
 import com.devpush.features.userRatingsReviews.domain.usecase.DeleteUserRatingUseCase
 import com.devpush.features.userRatingsReviews.domain.usecase.DeleteUserReviewUseCase
+import com.devpush.features.gameDetails.domain.sharing.ShareManager
+import com.devpush.features.gameDetails.domain.sharing.ShareableGameContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +35,8 @@ class GameDetailsViewModel(
     private val setUserRatingUseCase: SetUserRatingUseCase,
     private val setUserReviewUseCase: SetUserReviewUseCase,
     private val deleteUserRatingUseCase: DeleteUserRatingUseCase,
-    private val deleteUserReviewUseCase: DeleteUserReviewUseCase
+    private val deleteUserReviewUseCase: DeleteUserReviewUseCase,
+    private val shareManager: ShareManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GameDetailsUiState())
@@ -97,7 +100,7 @@ class GameDetailsViewModel(
                         )
                     }
                 },
-                onFailure = { error ->
+                onFailure = { _ ->
                     _uiState.update { 
                         it.copy(isCollectionsLoading = false)
                     }
@@ -131,10 +134,24 @@ class GameDetailsViewModel(
                     // Refresh collections to update the UI
                     loadCollections()
                     hideAddToCollectionDialog()
+                    
+                    // Provide feedback if action was triggered from FAB
+                    if (_uiState.value.fabMenuState.lastActionPerformed == FABAction.ADD_TO_COLLECTION) {
+                        _uiState.update { 
+                            it.copy(fabActionFeedback = "Added to ${collection.name}!")
+                        }
+                    }
                 },
-                onFailure = { error ->
+                onFailure = { _ ->
                     // Handle error - could show a snackbar or error dialog
                     hideAddToCollectionDialog()
+                    
+                    // Provide error feedback if action was triggered from FAB
+                    if (_uiState.value.fabMenuState.lastActionPerformed == FABAction.ADD_TO_COLLECTION) {
+                        _uiState.update { 
+                            it.copy(fabActionFeedback = "Failed to add to collection")
+                        }
+                    }
                 }
             )
         }
@@ -154,7 +171,7 @@ class GameDetailsViewModel(
                     // Refresh collections to update the UI
                     loadCollections()
                 },
-                onFailure = { error ->
+                onFailure = { _ ->
                     // Handle error silently for quick actions
                 }
             )
@@ -209,6 +226,13 @@ class GameDetailsViewModel(
                     // Reload user data to get updated rating
                     loadUserData(gameId)
                     _uiState.update { it.copy(isRatingLoading = false) }
+                    
+                    // Provide feedback if action was triggered from FAB
+                    if (_uiState.value.fabMenuState.lastActionPerformed == FABAction.RATE_GAME) {
+                        _uiState.update { 
+                            it.copy(fabActionFeedback = "Rating saved: $rating stars!")
+                        }
+                    }
                 },
                 onFailure = { error ->
                     _uiState.update { 
@@ -216,6 +240,13 @@ class GameDetailsViewModel(
                             isRatingLoading = false,
                             userDataError = error.message ?: "Failed to save rating"
                         )
+                    }
+                    
+                    // Provide error feedback if action was triggered from FAB
+                    if (_uiState.value.fabMenuState.lastActionPerformed == FABAction.RATE_GAME) {
+                        _uiState.update { 
+                            it.copy(fabActionFeedback = "Failed to save rating")
+                        }
                     }
                 }
             )
@@ -246,6 +277,13 @@ class GameDetailsViewModel(
                             showReviewDialog = false
                         )
                     }
+                    
+                    // Provide feedback if action was triggered from FAB
+                    if (_uiState.value.fabMenuState.lastActionPerformed == FABAction.WRITE_REVIEW) {
+                        _uiState.update { 
+                            it.copy(fabActionFeedback = "Review saved successfully!")
+                        }
+                    }
                 },
                 onFailure = { error ->
                     _uiState.update { 
@@ -253,6 +291,13 @@ class GameDetailsViewModel(
                             isReviewLoading = false,
                             userDataError = error.message ?: "Failed to save review"
                         )
+                    }
+                    
+                    // Provide error feedback if action was triggered from FAB
+                    if (_uiState.value.fabMenuState.lastActionPerformed == FABAction.WRITE_REVIEW) {
+                        _uiState.update { 
+                            it.copy(fabActionFeedback = "Failed to save review")
+                        }
                     }
                 }
             )
@@ -280,6 +325,148 @@ class GameDetailsViewModel(
                     }
                 }
             )
+        }
+    }
+    
+    // FAB Menu state management
+    
+    fun setFABMenuExpanded(expanded: Boolean) {
+        _uiState.update { 
+            it.copy(
+                isFABMenuExpanded = expanded,
+                fabMenuState = it.fabMenuState.copy(
+                    isExpanded = expanded,
+                    isAnimating = true
+                )
+            )
+        }
+    }
+    
+    fun setFABMenuAnimating(animating: Boolean) {
+        _uiState.update { 
+            it.copy(
+                fabMenuState = it.fabMenuState.copy(isAnimating = animating)
+            )
+        }
+    }
+    
+    fun updateFABMenuExpandProgress(progress: Float) {
+        _uiState.update { 
+            it.copy(
+                fabMenuState = it.fabMenuState.copy(expandProgress = progress)
+            )
+        }
+    }
+    
+    fun clearFABActionFeedback() {
+        _uiState.update { it.copy(fabActionFeedback = "") }
+    }
+    
+    // FAB Action handlers with feedback
+    
+    fun handleFABAddToCollection() {
+        _uiState.update { 
+            it.copy(
+                fabMenuState = it.fabMenuState.copy(lastActionPerformed = FABAction.ADD_TO_COLLECTION),
+                fabActionFeedback = "Opening collection dialog..."
+            )
+        }
+        showAddToCollectionDialog()
+        setFABMenuExpanded(false)
+    }
+    
+    fun handleFABRateGame() {
+        _uiState.update { 
+            it.copy(
+                fabMenuState = it.fabMenuState.copy(lastActionPerformed = FABAction.RATE_GAME),
+                fabActionFeedback = "Focusing on rating..."
+            )
+        }
+        focusOnRating()
+        setFABMenuExpanded(false)
+    }
+    
+    fun handleFABWriteReview() {
+        _uiState.update { 
+            it.copy(
+                fabMenuState = it.fabMenuState.copy(lastActionPerformed = FABAction.WRITE_REVIEW),
+                fabActionFeedback = "Opening review dialog..."
+            )
+        }
+        showReviewDialog()
+        setFABMenuExpanded(false)
+    }
+    
+    fun handleFABShareGame() {
+        _uiState.update { 
+            it.copy(
+                fabMenuState = it.fabMenuState.copy(lastActionPerformed = FABAction.SHARE_GAME),
+                fabActionFeedback = "Preparing to share..."
+            )
+        }
+        shareGame()
+    }
+    
+    fun focusOnRating() {
+        _uiState.update { 
+            it.copy(
+                shouldFocusRating = true,
+                isFABMenuExpanded = false
+            )
+        }
+    }
+    
+    fun clearRatingFocus() {
+        _uiState.update { it.copy(shouldFocusRating = false) }
+    }
+    
+     fun shareGame() {
+        val gameData = _uiState.value.data
+        if (gameData != null) {
+            viewModelScope.launch {
+                val shareableContent = ShareableGameContent(
+                    title = gameData.name,
+                    description = gameData.description,
+                    imageUrl = gameData.backgroundImage,
+                    platforms = gameData.platforms.map { it.name },
+                    additionalInfo = null
+                )
+                
+                shareManager.shareGame(
+                    title = shareableContent.title,
+                    description = shareableContent.description,
+                    imageUrl = shareableContent.imageUrl,
+                    additionalInfo = shareableContent.platforms.takeIf { it.isNotEmpty() }
+                        ?.let { "Available on: ${it.joinToString(", ")}" }
+                ).fold(
+                    onSuccess = {
+                        // Successfully shared
+                        _uiState.update { 
+                            it.copy(
+                                isFABMenuExpanded = false,
+                                fabActionFeedback = "Game shared successfully!"
+                            )
+                        }
+                    },
+                    onFailure = { error ->
+                        // Handle sharing error - could show a snackbar or error dialog
+                        _uiState.update { 
+                            it.copy(
+                                isFABMenuExpanded = false,
+                                fabActionFeedback = "Failed to share game",
+                                error = "Failed to share game: ${error.message}"
+                            )
+                        }
+                    }
+                )
+            }
+        } else {
+            _uiState.update { 
+                it.copy(
+                    isFABMenuExpanded = false,
+                    fabActionFeedback = "No game data available to share"
+                )
+            }
         }
     }
 

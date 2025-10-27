@@ -10,7 +10,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import com.devpush.features.ui.components.ExpressiveOutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,12 +56,13 @@ fun GameSearchBar(
         }
     }
     
-    OutlinedTextField(
+    ExpressiveOutlinedTextField(
         value = localQuery,
         onValueChange = { newValue ->
             localQuery = newValue
         },
         modifier = modifier.fillMaxWidth(),
+        contentDescription = "Search games input field",
         placeholder = {
             Text(
                 text = placeholder,

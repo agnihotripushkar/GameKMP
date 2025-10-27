@@ -13,9 +13,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+import com.devpush.features.ui.components.ExpressiveOutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.devpush.features.ui.components.ExpressiveTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -86,7 +86,7 @@ fun ReviewDialog(
         },
         text = {
             Column {
-                OutlinedTextField(
+                ExpressiveOutlinedTextField(
                     value = reviewText,
                     onValueChange = { newText ->
                         reviewText = newText
@@ -98,6 +98,7 @@ fun ReviewDialog(
                         .semantics {
                             contentDescription = "Review text input. $characterCount of $maxCharacters characters used."
                         },
+                    contentDescription = "Review text input field",
                     label = { Text("Your review") },
                     placeholder = { Text("Share your thoughts about this game...") },
                     minLines = 4,
@@ -153,7 +154,7 @@ fun ReviewDialog(
             }
         },
         confirmButton = {
-            TextButton(
+            ExpressiveTextButton(
                 onClick = {
                     if (reviewText.isBlank()) {
                         hasError = true
@@ -161,13 +162,17 @@ fun ReviewDialog(
                         onSave(reviewText.trim())
                     }
                 },
-                enabled = isTextValid
+                enabled = isTextValid,
+                contentDescription = if (isEditing) "Update review" else "Save review"
             ) {
                 Text(if (isEditing) "Update" else "Save")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            ExpressiveTextButton(
+                onClick = onDismiss,
+                contentDescription = "Cancel review dialog"
+            ) {
                 Text("Cancel")
             }
         },

@@ -31,7 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.devpush.features.ui.components.ExpressiveTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -300,12 +300,18 @@ private fun StatusTransitionConfirmationDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            ExpressiveTextButton(
+                onClick = onConfirm,
+                contentDescription = "Confirm add to collection"
+            ) {
                 Text("Confirm")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            ExpressiveTextButton(
+                onClick = onDismiss,
+                contentDescription = "Cancel add to collection"
+            ) {
                 Text("Cancel")
             }
         }

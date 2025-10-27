@@ -22,7 +22,7 @@ import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -244,9 +244,10 @@ fun ActiveFiltersChips(
                     animationSpec = tween(150)
                 ) + fadeOut(animationSpec = tween(150))
             ) {
-                OutlinedButton(
+                ExpressiveOutlinedButton(
                     onClick = onClearAll,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
+                    contentDescription = "Clear all active filters"
                 ) {
                     Text(
                         text = "Clear All",

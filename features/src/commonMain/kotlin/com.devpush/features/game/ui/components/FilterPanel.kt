@@ -18,7 +18,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -84,11 +84,12 @@ fun FilterPanel(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
-                OutlinedButton(
+                ExpressiveOutlinedButton(
                     onClick = onClearFilters,
                     enabled = selectedPlatforms.isNotEmpty() || 
                              selectedGenres.isNotEmpty() || 
-                             minRating > 0.0
+                             minRating > 0.0,
+                    contentDescription = "Clear all filters"
                 ) {
                     Icon(
                         imageVector = Icons.Default.Clear,

@@ -6,6 +6,26 @@ import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
 
+/**
+ * Represents the state of the FAB menu
+ */
+data class FABMenuState(
+    val isExpanded: Boolean = false,
+    val isAnimating: Boolean = false,
+    val expandProgress: Float = 0f,
+    val lastActionPerformed: FABAction? = null
+)
+
+/**
+ * Represents different FAB actions available in the menu
+ */
+enum class FABAction {
+    ADD_TO_COLLECTION,
+    RATE_GAME,
+    WRITE_REVIEW,
+    SHARE_GAME
+}
+
 data class GameDetailsUiState(
     val isLoading: Boolean = false,
     val error: String = "",
@@ -22,5 +42,10 @@ data class GameDetailsUiState(
     val userDataError: String = "",
     val showReviewDialog: Boolean = false,
     val isRatingLoading: Boolean = false,
-    val isReviewLoading: Boolean = false
+    val isReviewLoading: Boolean = false,
+    val shouldFocusRating: Boolean = false,
+    // FAB menu state
+    val isFABMenuExpanded: Boolean = false,
+    val fabMenuState: FABMenuState = FABMenuState(),
+    val fabActionFeedback: String = ""
 )

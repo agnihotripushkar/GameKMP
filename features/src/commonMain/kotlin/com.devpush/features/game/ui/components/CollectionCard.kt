@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VideoLibrary
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import com.devpush.features.bookmarklist.domain.collections.CollectionType
 import com.devpush.features.bookmarklist.domain.collections.GameCollection
 import com.devpush.features.game.domain.usecase.CollectionWithCount
+import com.devpush.features.ui.components.ExpressiveCard
+import com.devpush.features.ui.components.ExpressiveCardDefaults
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
@@ -73,7 +74,8 @@ fun CollectionCard(
 ) {
     var showDropdownMenu by remember { mutableStateOf(false) }
     
-    Card(
+    ExpressiveCard(
+        onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .height(160.dp)
@@ -81,11 +83,10 @@ fun CollectionCard(
                 onClick = onClick,
                 onLongClick = { showDropdownMenu = true }
             ),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
+        colors = ExpressiveCardDefaults.colors(
             containerColor = getCollectionCardColor(collection.type)
-        )
+        ),
+        contentDescription = "Collection card for ${collection.name} with ${collection.gameCount} games"
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(

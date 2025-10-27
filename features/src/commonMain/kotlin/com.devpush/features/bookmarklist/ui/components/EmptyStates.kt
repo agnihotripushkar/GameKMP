@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -242,8 +242,9 @@ fun EmptySearchResultsState(
         Spacer(modifier = Modifier.height(24.dp))
         
         // Clear search button
-        OutlinedButton(
-            onClick = onClearSearch
+        ExpressiveOutlinedButton(
+            onClick = onClearSearch,
+            contentDescription = "Clear search query"
         ) {
             Text("Clear Search")
         }
