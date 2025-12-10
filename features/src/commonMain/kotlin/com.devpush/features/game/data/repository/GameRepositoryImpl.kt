@@ -2,6 +2,7 @@ package com.devpush.features.game.data.repository
 
 import com.devpush.coreDatabase.AppDatabase
 import com.devpush.coreNetwork.apiService.ApiService
+import io.github.aakira.napier.Napier
 import com.devpush.features.game.data.mappers.toDomainListOfGames
 import com.devpush.features.game.data.mappers.toDomainGenres
 import com.devpush.features.game.data.mappers.toDomainPlatforms
@@ -54,13 +55,19 @@ class GameRepositoryImpl(
                 // Check if cache is still valid
                 val currentTime = DateTimeUtils.getCurrentTimestamp()
                 if (cachedGames != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
+                    Napier.d("Returning cached games. Count: ${cachedGames?.size}", tag = "GameRepository")
                     return@withLock Result.success(cachedGames!!)
                 }
                 
                 // Try to get fresh data from API
+                Napier.d("Fetching games from API...", tag = "GameRepository")
                 val result = apiService.getGames()
                 return@withLock if (result.isSuccess) {
-                    val games = result.getOrThrow().results.toDomainListOfGames()
+                    val rawResult = result.getOrThrow()
+                    Napier.d("API success. Raw count: ${rawResult.results.size}", tag = "GameRepository")
+                    val games = rawResult.results.toDomainListOfGames()
+                    Napier.d("Mapped games count: ${games.size}", tag = "GameRepository")
+
                     cachedGames = games
                     cacheTimestamp = currentTime
                     
@@ -73,9 +80,11 @@ class GameRepositoryImpl(
                     Result.success(games)
                 } else {
                     // Network failed, try offline cache
+                    Napier.e("API failed: ${result.exceptionOrNull()?.message}", tag = "GameRepository")
                     handleNetworkFailure(result.exceptionOrNull())
                 }
             } catch (exception: Exception) {
+                Napier.e("Unexpected error in getGames", exception, tag = "GameRepository")
                 handleNetworkFailure(exception)
             }
         }

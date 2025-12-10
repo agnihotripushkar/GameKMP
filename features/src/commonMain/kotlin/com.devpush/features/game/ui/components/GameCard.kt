@@ -149,7 +149,13 @@ fun GameCard(
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
                     .background(
-                        color = Color.Black.copy(alpha = 0.5f),
+                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.6f),
+                                Color.Black.copy(alpha = 0.9f)
+                            )
+                        )
                     )
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {

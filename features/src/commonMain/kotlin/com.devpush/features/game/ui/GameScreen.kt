@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Collections
@@ -70,7 +71,7 @@ import com.devpush.features.game.ui.components.AddToCollectionDialog
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
@@ -483,14 +484,25 @@ fun GameScreen(
                         contentPadding = PaddingValues(bottom = 16.dp)
                     ) {
                         items(uiState.value.filteredGames) { gameItem ->
-                            GameCard(
-                                gameItem = gameItem,
-                                onClick = { onClick(gameItem.id) },
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                                searchQuery = uiState.value.searchFilterState.searchQuery,
-                                onAddToCollection = { game -> viewModel.showAddToCollectionDialog(game) },
-                                collectionsContainingGame = uiState.value.gameCollectionMap[gameItem.id] ?: emptyList()
-                            )
+                            // Calculate index for staggered animation (simple approximation based on list position if available, 
+                            // but since items doesn't give index directly easily here without changing structure, 
+                            // we'll rely on a simple enter animation for now or use itemsIndexed)
+                            
+                             AnimatedVisibility(
+                                visible = true,
+                                enter = fadeIn(animationSpec = tween(300)) + 
+                                        scaleIn(initialScale = 0.9f, animationSpec = tween(300)),
+                                modifier = Modifier.animateItem()
+                            ) {
+                                GameCard(
+                                    gameItem = gameItem,
+                                    onClick = { onClick(gameItem.id) },
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                    searchQuery = uiState.value.searchFilterState.searchQuery,
+                                    onAddToCollection = { game -> viewModel.showAddToCollectionDialog(game) },
+                                    collectionsContainingGame = uiState.value.gameCollectionMap[gameItem.id] ?: emptyList()
+                                )
+                            }
                         }
                     }
                 }

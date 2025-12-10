@@ -9,6 +9,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.LogLevel
+import io.github.aakira.napier.Napier
 import kotlinx.serialization.json.Json
 
 object KtorClient {
@@ -19,6 +23,15 @@ object KtorClient {
             json(json = Json {
                 ignoreUnknownKeys = true
             })
+        }
+
+        install(Logging) {
+            logger = object : Logger {
+                override fun log(message: String) {
+                    Napier.d(message, tag = "HTTP Client")
+                }
+            }
+            level = LogLevel.ALL
         }
 // https://api.rawg.io/api/games?key=1abb1867f52548a4aa9f54dd4946af2f
         install(DefaultRequest) {
@@ -31,9 +44,9 @@ object KtorClient {
         }
 
         install(HttpTimeout) {
-            socketTimeoutMillis = 3000
-            connectTimeoutMillis = 3000
-            requestTimeoutMillis = 3000
+            socketTimeoutMillis = 30_000
+            connectTimeoutMillis = 30_000
+            requestTimeoutMillis = 30_000
         }
 
     }

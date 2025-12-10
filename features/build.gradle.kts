@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.sql.delight)
 }
 
 kotlin {
@@ -51,6 +50,7 @@ kotlin {
             implementation(libs.material.icons.core)
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
             implementation(libs.kotlinx.datetime)
+            implementation(libs.napier)
 
         }
 

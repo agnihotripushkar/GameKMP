@@ -27,12 +27,13 @@ import kmp.composeapp.generated.resources.compose_multiplatform
 
 import androidx.navigation.createGraph
 import io.github.aakira.napier.Napier
+import com.devpush.kmp.ui.theme.GameKMPTheme
 
 @Composable
 @Preview
 fun App() {
     Napier.v("Hello Napier")
-    MaterialTheme {
+    GameKMPTheme {
         val navHostController = rememberNavController()
         val bottomPadding = WindowInsets.statusBars.asPaddingValues().calculateBottomPadding()
 

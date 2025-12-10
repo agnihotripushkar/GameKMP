@@ -19,6 +19,7 @@ import com.devpush.features.game.domain.validation.FilterValidator
 import com.devpush.features.game.domain.validation.ValidationResult
 import com.devpush.features.common.utils.SearchUtils
 import com.devpush.features.common.utils.StringUtils
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
@@ -67,10 +68,12 @@ class GameViewModel(
         // Clear caches when refreshing data
         clearCaches()
         
+        Napier.d("Extensions: getGames called", tag = "GameViewModel")
         flow {
             emit(gameRepository.getGames())
         }.flowOn(Dispatchers.IO)
             .catch { exception ->
+                Napier.e("Error fetching games flow", exception, tag = "GameViewModel")
                 emit(Result.failure(exception))
             }
             .onStart {
@@ -85,6 +88,7 @@ class GameViewModel(
             }
             .onEach { result ->
                 result.onSuccess { games ->
+                    Napier.d("GameViewModel received success. Games count: ${games.size}", tag = "GameViewModel")
                     try {
                         val filterOptions = getAvailableFiltersUseCase(games)
                         _uiState.update { currentState ->
@@ -100,6 +104,7 @@ class GameViewModel(
                             )
                         }
                     } catch (exception: Exception) {
+                        Napier.e("Error updating UI state with games", exception, tag = "GameViewModel")
                         _uiState.update { 
                             it.copy(
                                 isLoading = false,
@@ -109,6 +114,7 @@ class GameViewModel(
                         }
                     }
                 }.onFailure { exception ->
+                    Napier.e("GameViewModel received failure", exception, tag = "GameViewModel")
                     val errorType = when {
                         exception.message?.let { with(SearchUtils) { it.containsIgnoreCase("network") } } == true -> 
                             SearchFilterError.NetworkError

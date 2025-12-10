@@ -168,17 +168,19 @@ fun GameDetailsScreenContent(
                 item {
                     AsyncImage(
                         model = data.backgroundImage, contentDescription = null,
-                        modifier = Modifier.fillMaxWidth().height(350.dp),
+                        modifier = Modifier.fillMaxWidth().height(450.dp),
                         contentScale = ContentScale.Crop
                     )
                 }
 
                 item {
                     Text(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                             .fillMaxWidth(),
                         text = data.name,
-                        style = MaterialTheme.typography.headlineSmall // M3: Was h4
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -242,9 +244,10 @@ fun GameDetailsScreenContent(
                                             contentScale = ContentScale.Crop
                                         )
                                         Text(
-                                            modifier = Modifier.padding(vertical = 8.dp),
+                                            modifier = Modifier.padding(vertical = 12.dp),
                                             text = it.name,
-                                            style = MaterialTheme.typography.bodySmall // M3: Was caption
+                                            style = MaterialTheme.typography.titleSmall,
+                                            color = MaterialTheme.colorScheme.onSurface
                                         )
 
                                     }
