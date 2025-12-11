@@ -49,12 +49,6 @@ object GameNavGraph : BaseNavGraph {
                     modifier = modifier.fillMaxSize(),
                     onClick = {
                         navHostController.navigate(Dest.Details(it))
-                    },
-                    onNavigateToCollections = {
-                        navHostController.navigate(Dest.Collections)
-                    },
-                    onNavigateToStatistics = {
-                        navHostController.navigate(Dest.Statistics)
                     }
                 )
             }

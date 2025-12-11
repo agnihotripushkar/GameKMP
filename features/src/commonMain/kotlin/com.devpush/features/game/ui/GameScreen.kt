@@ -41,6 +41,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -49,6 +51,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,9 +79,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    onClick: (Int) -> Unit,
-    onNavigateToCollections: () -> Unit = {},
-    onNavigateToStatistics: () -> Unit = {}
+    onClick: (Int) -> Unit
 ) {
     val viewModel = koinViewModel<GameViewModel>()
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -101,40 +103,6 @@ fun GameScreen(
             TopAppBar(
                 title = { Text(text = "Games") },
                 actions = {
-                    // Statistics button
-                    IconButton(
-                        onClick = onNavigateToStatistics
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.BarChart,
-                            contentDescription = "View statistics",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    
-                    // Collections button
-                    IconButton(
-                        onClick = onNavigateToCollections
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Collections,
-                            contentDescription = "View collections",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    
-                    // Refresh button
-                    IconButton(
-                        onClick = { viewModel.refreshGames() },
-                        enabled = !uiState.value.isLoading && !uiState.value.isRefreshing
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh games",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                    
                     // Filter toggle button
                     IconButton(
                         onClick = { showFilterPanel = !showFilterPanel }
@@ -157,11 +125,19 @@ fun GameScreen(
             )
         }
     ) { paddingValues ->
-        Column(
+        val pullToRefreshState = rememberPullToRefreshState()
+        
+        PullToRefreshBox(
+            isRefreshing = uiState.value.isRefreshing,
+            onRefresh = { viewModel.refreshGames() },
+            state = pullToRefreshState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
             // Search Bar
             GameSearchBar(
                 query = uiState.value.searchFilterState.searchQuery,
@@ -170,20 +146,27 @@ fun GameScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            // Filter Panel
+            // Filter Bottom Sheet
             if (showFilterPanel) {
-                FilterPanel(
-                    availablePlatforms = uiState.value.availablePlatforms,
-                    availableGenres = uiState.value.availableGenres,
-                    selectedPlatforms = uiState.value.searchFilterState.selectedPlatforms,
-                    selectedGenres = uiState.value.searchFilterState.selectedGenres,
-                    minRating = uiState.value.searchFilterState.minRating,
-                    onPlatformToggle = viewModel::togglePlatform,
-                    onGenreToggle = viewModel::toggleGenre,
-                    onRatingChange = viewModel::updateMinRating,
-                    onClearFilters = viewModel::clearAllFilters,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                val sheetState = rememberModalBottomSheetState()
+                
+                ModalBottomSheet(
+                    onDismissRequest = { showFilterPanel = false },
+                    sheetState = sheetState
+                ) {
+                    FilterPanel(
+                        availablePlatforms = uiState.value.availablePlatforms,
+                        availableGenres = uiState.value.availableGenres,
+                        selectedPlatforms = uiState.value.searchFilterState.selectedPlatforms,
+                        selectedGenres = uiState.value.searchFilterState.selectedGenres,
+                        minRating = uiState.value.searchFilterState.minRating,
+                        onPlatformToggle = viewModel::togglePlatform,
+                        onGenreToggle = viewModel::toggleGenre,
+                        onRatingChange = viewModel::updateMinRating,
+                        onClearFilters = viewModel::clearAllFilters,
+                        modifier = Modifier.padding(bottom = 32.dp) // Add padding for bottom navigation overdraw
+                    )
+                }
             }
 
             // Active Filters Chips
@@ -518,11 +501,12 @@ fun GameScreen(
                 onAddToCollection = { collection -> viewModel.addGameToCollection(collection) }
             )
         }
+        } // End of PullToRefreshBox
     }
 }
 
 @Preview
 @Composable
 fun GameScreenPreview() {
-    GameScreen(onClick = {}, onNavigateToCollections = {}, onNavigateToStatistics = {})
+    GameScreen(onClick = {})
 }

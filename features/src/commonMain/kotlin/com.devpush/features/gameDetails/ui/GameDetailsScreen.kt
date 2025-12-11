@@ -165,24 +165,51 @@ fun GameDetailsScreenContent(
                 state = listState
             ) {
 
+                // Hero Image with Gradient Overlay
                 item {
-                    AsyncImage(
-                        model = data.backgroundImage, contentDescription = null,
-                        modifier = Modifier.fillMaxWidth().height(450.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                    Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
+                        AsyncImage(
+                            model = data.backgroundImage,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        // Gradient Overlay for text readability and transition
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color.Transparent,
+                                            MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
+                                            MaterialTheme.colorScheme.background
+                                        ),
+                                        startY = 100f
+                                    )
+                                )
+                        )
+                        // Title on top of the image (bottom aligned)
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                text = data.name,
+                                style = MaterialTheme.typography.displaySmall.copy(
+                                    shadow = androidx.compose.ui.graphics.Shadow(
+                                        color = Color.Black,
+                                        blurRadius = 12f
+                                    )
+                                ),
+                                color = Color.White
+                            )
+                        }
+                    }
                 }
 
-                item {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
-                            .fillMaxWidth(),
-                        text = data.name,
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                // Title moved to Hero section
 
                 item {
                     Text(
@@ -326,14 +353,19 @@ fun GameDetailsScreenContent(
                         data.tags.forEach { 
                             Row(
                                 modifier = Modifier.padding(top = 8.dp, end = 12.dp).background(
-                                    color = Color.White,
-                                    shape = RoundedCornerShape(200.dp)
+                                    color = MaterialTheme.colorScheme.surfaceVariant, // Darker background
+                                    shape = RoundedCornerShape(50)
                                 ).border(
-                                    width = .5.dp,
-                                    color = Color.LightGray,
-                                    shape = RoundedCornerShape(200.dp)
+                                    width = 1.dp,
+                                    brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.secondary,
+                                            MaterialTheme.colorScheme.tertiary
+                                        )
+                                    ),
+                                    shape = RoundedCornerShape(50)
                                 )
-                                    .clip(RoundedCornerShape(200.dp)),
+                                    .clip(RoundedCornerShape(50)),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 AsyncImage(
@@ -421,33 +453,8 @@ fun GameDetailsScreenContent(
                     )
                 }
 
+
                 Spacer(modifier = Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        onSave(data.id, data.name, data.backgroundImage)
-                    },
-                    modifier = Modifier.background(color = Color.White, shape = CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite, contentDescription = null,
-                        modifier = Modifier.padding(4.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                IconButton(
-                    onClick = {
-                        onDelete(data.id)
-                    },
-                    modifier = Modifier.background(color = Color.White, shape = CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete, contentDescription = null,
-                        modifier = Modifier.padding(4.dp)
-                    )
-                }
             }
             
             // Expressive FAB Menu positioned at bottom-right
@@ -457,6 +464,12 @@ fun GameDetailsScreenContent(
                 onAddToCollection = {
                     onShowAddToCollectionDialog()
                     onFABMenuExpandedChange(false)
+                },
+                onSaveGame = {
+                    onSave(data.id, data.name, data.backgroundImage)
+                },
+                onDeleteGame = {
+                    onDelete(data.id)
                 },
                 onRateGame = {
                     // Focus on rating component and collapse FAB menu

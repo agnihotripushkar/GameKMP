@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.FloatingActionButton
@@ -41,6 +43,8 @@ fun ExpressiveFABMenu(
     isExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onAddToCollection: () -> Unit,
+    onSaveGame: () -> Unit,
+    onDeleteGame: () -> Unit,
     onRateGame: () -> Unit,
     onWriteReview: () -> Unit,
     onShareGame: () -> Unit,
@@ -67,6 +71,37 @@ fun ExpressiveFABMenu(
         ) {
             // Expandable FAB actions
             if (isExpanded) {
+                SmallFloatingActionButton(
+                    onClick = {
+                        onDeleteGame()
+                        onExpandedChange(false)
+                    },
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.semantics {
+                        contentDescription = "Delete this game"
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null
+                    )
+                }
+
+                SmallFloatingActionButton(
+                    onClick = {
+                        onSaveGame()
+                        onExpandedChange(false)
+                    },
+                    modifier = Modifier.semantics {
+                        contentDescription = "Save this game to favorites"
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = null
+                    )
+                }
                 SmallFloatingActionButton(
                     onClick = {
                         onShareGame()

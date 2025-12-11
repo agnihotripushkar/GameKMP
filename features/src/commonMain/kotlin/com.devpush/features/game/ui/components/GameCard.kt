@@ -1,6 +1,7 @@
 package com.devpush.features.game.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,7 +66,18 @@ fun GameCard(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(350.dp),
+            .height(320.dp) // Adjusted height
+            .clip(RoundedCornerShape(24.dp)) // Increased corner radius
+            .border(
+                width = 2.dp,
+                brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.secondary, // Neon Blue
+                        MaterialTheme.colorScheme.primary   // Neon Purple
+                    )
+                ),
+                shape = RoundedCornerShape(24.dp)
+            ),
         contentDescription = "Game card for ${gameItem.name}"
     ) {
         Box(Modifier.fillMaxSize()) {
@@ -161,10 +173,10 @@ fun GameCard(
             ) {
                 Text(
                     text = buildHighlightedText(gameItem.name, searchQuery),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge, // Bolder, larger
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    maxLines = 1,
+                    maxLines = 2, // Allow 2 lines for better readability
                     overflow = TextOverflow.Ellipsis
                 )
             }

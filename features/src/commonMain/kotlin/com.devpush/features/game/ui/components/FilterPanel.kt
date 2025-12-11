@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,161 +56,153 @@ fun FilterPanel(
     onClearFilters: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        // Header with clear button
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Header with clear button
+            Text(
+                text = "Filters",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            ExpressiveOutlinedButton(
+                onClick = onClearFilters,
+                enabled = selectedPlatforms.isNotEmpty() || 
+                         selectedGenres.isNotEmpty() || 
+                         minRating > 0.0,
+                contentDescription = "Clear all filters"
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp)
+                )
+                Text("Clear All")
+            }
+        }
+        
+        // Platform filters
+        if (availablePlatforms.isNotEmpty()) {
+            Column {
+                Text(
+                    text = "Platforms",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    availablePlatforms.forEach { platform ->
+                        FilterChip(
+                            selected = selectedPlatforms.contains(platform),
+                            onClick = { onPlatformToggle(platform) },
+                            label = {
+                                Text(
+                                    text = platform.name,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Genre filters
+        if (availableGenres.isNotEmpty()) {
+            Column {
+                Text(
+                    text = "Genres",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    availableGenres.forEach { genre ->
+                        FilterChip(
+                            selected = selectedGenres.contains(genre),
+                            onClick = { onGenreToggle(genre) },
+                            label = {
+                                Text(
+                                    text = genre.name,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        
+        // Rating filter
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Filters",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    text = "Minimum Rating",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 
-                ExpressiveOutlinedButton(
-                    onClick = onClearFilters,
-                    enabled = selectedPlatforms.isNotEmpty() || 
-                             selectedGenres.isNotEmpty() || 
-                             minRating > 0.0,
-                    contentDescription = "Clear all filters"
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = 4.dp)
-                    )
-                    Text("Clear All")
-                }
-            }
-            
-            // Platform filters
-            if (availablePlatforms.isNotEmpty()) {
-                Column {
-                    Text(
-                        text = "Platforms",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        availablePlatforms.forEach { platform ->
-                            FilterChip(
-                                selected = selectedPlatforms.contains(platform),
-                                onClick = { onPlatformToggle(platform) },
-                                label = {
-                                    Text(
-                                        text = platform.name,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-            
-            // Genre filters
-            if (availableGenres.isNotEmpty()) {
-                Column {
-                    Text(
-                        text = "Genres",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    FlowRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        availableGenres.forEach { genre ->
-                            FilterChip(
-                                selected = selectedGenres.contains(genre),
-                                onClick = { onGenreToggle(genre) },
-                                label = {
-                                    Text(
-                                        text = genre.name,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-            
-            // Rating filter
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Minimum Rating",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Text(
-                        text = if (minRating > 0.0) String.format("%.1f+", minRating) else "Any",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Slider(
-                    value = minRating.toFloat(),
-                    onValueChange = { onRatingChange(it.toDouble()) },
-                    valueRange = 0f..5f,
-                    steps = 9, // 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = if (minRating > 0.0) String.format("%.1f+", minRating) else "Any",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
-                // Rating scale labels
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "0.0",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "5.0",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Slider(
+                value = minRating.toFloat(),
+                onValueChange = { onRatingChange(it.toDouble()) },
+                valueRange = 0f..5f,
+                steps = 9, // 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0
+                modifier = Modifier.fillMaxWidth()
+            )
+            
+            // Rating scale labels
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "0.0",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "5.0",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
