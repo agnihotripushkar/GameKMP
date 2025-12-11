@@ -44,10 +44,10 @@ import coil3.compose.AsyncImage
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.Platform
 import com.devpush.features.game.domain.model.Genre
-import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
-import com.devpush.features.userRatingsReviews.domain.model.UserRating
-import com.devpush.features.userRatingsReviews.domain.model.UserReview
-import com.devpush.features.userRatingsReviews.ui.components.QuickRating
+import com.devpush.features.statistics.domain.model.GameWithUserData
+import com.devpush.features.statistics.domain.model.UserRating
+import com.devpush.features.statistics.domain.model.UserReview
+import com.devpush.features.statistics.ui.components.QuickRating
 import com.devpush.features.ui.components.ExpressiveCard
 import com.devpush.features.common.utils.DateTimeUtils
 import org.jetbrains.compose.ui.tooling.preview.Preview

@@ -46,8 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.bookmarklist.domain.collections.CollectionType
-import com.devpush.features.bookmarklist.domain.collections.GameCollection
+import com.devpush.features.collections.domain.collections.CollectionType
+import com.devpush.features.collections.domain.collections.GameCollection
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**

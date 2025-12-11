@@ -1,7 +1,7 @@
 package com.devpush.features.game.data.mappers
 
-import com.devpush.features.bookmarklist.domain.collections.GameCollection
-import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.collections.domain.collections.GameCollection
+import com.devpush.features.collections.domain.collections.CollectionType
 import comdevpushcoreDatabase.Game_collection
 
 /**

@@ -1,0 +1,43 @@
+package com.devpush.features.statistics.di
+
+import com.devpush.features.statistics.data.repository.UserRatingReviewRepositoryImpl
+import com.devpush.features.statistics.domain.repository.UserRatingReviewRepository
+import com.devpush.features.statistics.domain.usecase.DeleteUserRatingUseCase
+import com.devpush.features.statistics.domain.usecase.DeleteUserReviewUseCase
+import com.devpush.features.statistics.domain.usecase.GetGamesWithUserDataUseCase
+import com.devpush.features.statistics.domain.usecase.GetGameWithUserDataUseCase
+import com.devpush.features.statistics.domain.usecase.GetRecentUserActivityUseCase
+import com.devpush.features.statistics.domain.usecase.GetUserRatingStatsUseCase
+import com.devpush.features.statistics.domain.usecase.GetUserRatingUseCase
+import com.devpush.features.statistics.domain.usecase.GetUserReviewUseCase
+import com.devpush.features.statistics.domain.usecase.SetUserRatingUseCase
+import com.devpush.features.statistics.domain.usecase.SetUserReviewUseCase
+import com.devpush.features.statistics.domain.validation.InputSanitizer
+import com.devpush.features.statistics.domain.validation.UserRatingReviewValidator
+import com.devpush.features.statistics.ui.statistics.StatisticsViewModel
+import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
+
+fun getUserRatingReviewModule() = module {
+    // Repository
+    single<UserRatingReviewRepository> { UserRatingReviewRepositoryImpl(get(), get()) }
+    
+    // Validation
+    single { UserRatingReviewValidator }
+    single { InputSanitizer }
+    
+    // Use Cases
+    single { GetGameWithUserDataUseCase(get()) }
+    single { GetGamesWithUserDataUseCase(get()) }
+    single { GetUserRatingUseCase(get()) }
+    single { GetUserReviewUseCase(get()) }
+    single { GetUserRatingStatsUseCase(get()) }
+    single { GetRecentUserActivityUseCase(get()) }
+    single { SetUserRatingUseCase(get(), get()) }
+    single { SetUserReviewUseCase(get(), get(), get()) }
+    single { DeleteUserRatingUseCase(get()) }
+    single { DeleteUserReviewUseCase(get()) }
+    
+    // ViewModels
+    viewModel { StatisticsViewModel(get(), get()) }
+}

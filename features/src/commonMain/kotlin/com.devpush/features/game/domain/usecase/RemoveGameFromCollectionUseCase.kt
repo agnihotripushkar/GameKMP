@@ -1,6 +1,6 @@
 package com.devpush.features.game.domain.usecase
 
-import com.devpush.features.bookmarklist.domain.collections.CollectionError
+import com.devpush.features.collections.domain.collections.CollectionError
 import com.devpush.features.game.domain.repository.GameCollectionRepository
 
 /**

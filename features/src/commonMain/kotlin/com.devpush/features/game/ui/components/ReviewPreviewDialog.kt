@@ -28,11 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
+import com.devpush.features.statistics.domain.model.GameWithUserData
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.userRatingsReviews.domain.model.UserRating
-import com.devpush.features.userRatingsReviews.domain.model.UserReview
+import com.devpush.features.statistics.domain.model.UserRating
+import com.devpush.features.statistics.domain.model.UserReview
 import com.devpush.features.common.utils.DateTimeUtils
 
 /**

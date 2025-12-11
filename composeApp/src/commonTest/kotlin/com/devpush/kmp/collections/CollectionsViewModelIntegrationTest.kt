@@ -1,8 +1,8 @@
 package com.devpush.kmp.collections
 
-import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.collections.domain.collections.CollectionType
 import com.devpush.features.game.domain.usecase.*
-import com.devpush.features.bookmarklist.ui.collections.CollectionsViewModel
+import com.devpush.features.collections.ui.collections.CollectionsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first

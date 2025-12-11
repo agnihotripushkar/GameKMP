@@ -28,10 +28,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -43,7 +41,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
-import com.devpush.features.ui.components.ExpressiveOutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -75,7 +72,8 @@ import com.devpush.features.game.ui.components.AddToCollectionDialog
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class)
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
@@ -281,9 +279,8 @@ fun GameScreen(
                             )
                         }
                         if (uiState.value.canRetry) {
-                            ExpressiveOutlinedButton(
+                            Button(
                                 onClick = { viewModel.retryOperation() },
-                                contentDescription = "Retry loading games"
                             ) {
                                 Text("Retry")
                             }

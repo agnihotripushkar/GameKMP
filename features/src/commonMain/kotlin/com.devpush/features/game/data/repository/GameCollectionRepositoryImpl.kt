@@ -2,9 +2,9 @@ package com.devpush.features.game.data.repository
 
 import com.devpush.coreDatabase.AppDatabase
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.bookmarklist.domain.collections.GameCollection
-import com.devpush.features.bookmarklist.domain.collections.CollectionType
-import com.devpush.features.bookmarklist.domain.collections.CollectionError
+import com.devpush.features.collections.domain.collections.GameCollection
+import com.devpush.features.collections.domain.collections.CollectionType
+import com.devpush.features.collections.domain.collections.CollectionError
 import com.devpush.features.game.domain.repository.GameCollectionRepository
 import com.devpush.features.game.data.mappers.toDomain
 import com.devpush.features.game.data.mappers.toDomainCollections

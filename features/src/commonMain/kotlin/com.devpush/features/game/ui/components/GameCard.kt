@@ -38,7 +38,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.devpush.features.game.domain.model.Game
-import com.devpush.features.bookmarklist.domain.collections.CollectionType
+import com.devpush.features.collections.domain.collections.CollectionType
 import com.devpush.features.ui.components.ExpressiveCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.common.utils.StringUtils

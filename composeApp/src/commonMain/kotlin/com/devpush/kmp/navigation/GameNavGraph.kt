@@ -9,9 +9,9 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.devpush.features.game.ui.GameScreen
 import com.devpush.features.gameDetails.ui.GameDetailsScreen
-import com.devpush.features.bookmarklist.ui.collections.CollectionsScreen
-import com.devpush.features.bookmarklist.ui.collections.CollectionDetailScreen
-import com.devpush.features.userRatingsReviews.ui.statistics.StatisticsScreen
+import com.devpush.features.collections.ui.collections.CollectionsScreen
+import com.devpush.features.collections.ui.collections.CollectionDetailScreen
+import com.devpush.features.statistics.ui.statistics.StatisticsScreen
 import kotlinx.serialization.Serializable
 
 object GameNavGraph : BaseNavGraph {

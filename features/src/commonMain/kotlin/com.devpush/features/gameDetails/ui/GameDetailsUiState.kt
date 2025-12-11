@@ -1,10 +1,10 @@
 package com.devpush.features.gameDetails.ui
 
 import com.devpush.features.gameDetails.domain.model.GameDetails
-import com.devpush.features.bookmarklist.domain.collections.GameCollection
-import com.devpush.features.bookmarklist.domain.collections.CollectionType
-import com.devpush.features.userRatingsReviews.domain.model.UserRating
-import com.devpush.features.userRatingsReviews.domain.model.UserReview
+import com.devpush.features.collections.domain.collections.GameCollection
+import com.devpush.features.collections.domain.collections.CollectionType
+import com.devpush.features.statistics.domain.model.UserRating
+import com.devpush.features.statistics.domain.model.UserReview
 
 /**
  * Represents the state of the FAB menu

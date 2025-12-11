@@ -1,9 +1,9 @@
 package com.devpush.kmp.userRatingsReviews
 
-import com.devpush.features.userRatingsReviews.domain.model.*
-import com.devpush.features.userRatingsReviews.domain.repository.UserRatingReviewRepository
-import com.devpush.features.userRatingsReviews.domain.repository.RecentActivity
-import com.devpush.features.userRatingsReviews.domain.usecase.*
+import com.devpush.features.statistics.domain.model.*
+import com.devpush.features.statistics.domain.repository.UserRatingReviewRepository
+import com.devpush.features.statistics.domain.repository.RecentActivity
+import com.devpush.features.statistics.domain.usecase.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 

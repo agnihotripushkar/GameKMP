@@ -1,8 +1,8 @@
 package com.devpush.features.game.domain.usecase
 
-import com.devpush.features.bookmarklist.domain.collections.CollectionFilterState
-import com.devpush.features.bookmarklist.domain.collections.CollectionSortOption
-import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
+import com.devpush.features.collections.domain.collections.CollectionFilterState
+import com.devpush.features.collections.domain.collections.CollectionSortOption
+import com.devpush.features.statistics.domain.model.GameWithUserData
 import com.devpush.features.common.utils.StringUtils
 
 /**
