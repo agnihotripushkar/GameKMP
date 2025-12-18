@@ -4,6 +4,8 @@ import com.devpush.features.collections.domain.collections.GameCollection
 import com.devpush.features.collections.domain.collections.CollectionType
 import com.devpush.features.collections.domain.collections.CollectionError
 import com.devpush.features.game.domain.repository.GameCollectionRepository
+import kotlinx.datetime.Clock
+
 
 /**
  * Use case for updating collection properties with validation
@@ -129,8 +131,9 @@ class UpdateCollectionUseCaseImpl(
             val updatedCollection = currentCollection.copy(
                 name = finalName,
                 description = finalDescription,
-                updatedAt = System.currentTimeMillis()
+                updatedAt = Clock.System.now().toEpochMilliseconds()
             )
+
             
             // Validate the updated collection
             val collectionValidation = updatedCollection.validate()

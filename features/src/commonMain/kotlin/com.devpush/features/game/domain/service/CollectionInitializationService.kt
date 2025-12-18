@@ -10,6 +10,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.Clock
+
 
 /**
  * Service responsible for initializing collections on app startup
@@ -58,7 +60,8 @@ class CollectionInitializationServiceImpl(
     override suspend fun initializeOnAppStart(): Result<InitializationResult> {
         return initializationMutex.withLock {
             try {
-                val startTime = System.currentTimeMillis()
+                val startTime = Clock.System.now().toEpochMilliseconds()
+
                 
                 // Check if already initialized
                 if (isInitializedFlag) {
@@ -66,8 +69,9 @@ class CollectionInitializationServiceImpl(
                         InitializationResult(
                             defaultCollectionsCreated = emptyList(),
                             wasAlreadyInitialized = true,
-                            initializationTimeMs = System.currentTimeMillis() - startTime
+                            initializationTimeMs = Clock.System.now().toEpochMilliseconds() - startTime
                         )
+
                     )
                 }
                 
@@ -96,8 +100,9 @@ class CollectionInitializationServiceImpl(
                 // Mark as initialized
                 isInitializedFlag = true
                 
-                val endTime = System.currentTimeMillis()
+                val endTime = Clock.System.now().toEpochMilliseconds()
                 val result = InitializationResult(
+
                     defaultCollectionsCreated = createdCollections,
                     wasAlreadyInitialized = alreadyInitialized,
                     migrationPerformed = false, // Future: implement migration logic here

@@ -172,8 +172,9 @@ fun FilterPanel(
                 )
                 
                 Text(
-                    text = if (minRating > 0.0) String.format("%.1f+", minRating) else "Any",
+                    text = if (minRating > 0.0) "${(kotlin.math.round(minRating * 10) / 10.0)}+" else "Any",
                     style = MaterialTheme.typography.bodyMedium,
+
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

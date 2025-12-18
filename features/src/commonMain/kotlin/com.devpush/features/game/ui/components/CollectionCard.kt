@@ -50,6 +50,8 @@ import com.devpush.features.game.domain.usecase.CollectionWithCount
 import com.devpush.features.ui.components.ExpressiveCard
 import com.devpush.features.ui.components.ExpressiveCardDefaults
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlinx.datetime.Clock
+
 
 /**
  * Card component for displaying game collections in a grid layout.
@@ -355,8 +357,9 @@ fun CollectionCardPreview() {
                 name = "My Wishlist",
                 type = CollectionType.WISHLIST,
                 gameIds = listOf(1, 2, 3, 4, 5),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 5
         ),
@@ -376,8 +379,9 @@ fun CollectionCardCustomPreview() {
                 name = "Indie Games Collection",
                 type = CollectionType.CUSTOM,
                 gameIds = listOf(1, 2),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 2
         ),
@@ -397,8 +401,9 @@ fun CollectionCardEmptyPreview() {
                 name = "Currently Playing",
                 type = CollectionType.CURRENTLY_PLAYING,
                 gameIds = emptyList(),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 0
         ),

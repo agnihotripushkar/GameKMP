@@ -5,6 +5,8 @@ import com.devpush.features.collections.domain.collections.CollectionType
 import com.devpush.features.collections.domain.collections.CollectionError
 import com.devpush.features.collections.domain.collections.ValidationResult
 import com.devpush.features.game.domain.repository.GameCollectionRepository
+import kotlinx.datetime.Clock
+
 
 /**
  * Use case for creating new game collections with validation and default collection initialization
@@ -155,9 +157,10 @@ class CreateCollectionUseCaseImpl(
             name = name,
             type = type,
             gameIds = emptyList(),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis(),
+            createdAt = Clock.System.now().toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds(),
             description = description
+
         )
         
         // Validate name

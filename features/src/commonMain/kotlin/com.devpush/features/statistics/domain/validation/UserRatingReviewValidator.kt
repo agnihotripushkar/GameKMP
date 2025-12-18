@@ -2,6 +2,8 @@ package com.devpush.features.statistics.domain.validation
 
 import com.devpush.features.statistics.domain.model.UserRatingReviewError
 import com.devpush.features.statistics.domain.model.UserReview
+import kotlinx.datetime.Clock
+
 
 /**
  * Validator for user ratings and reviews to ensure valid input and prevent invalid data
@@ -78,9 +80,10 @@ object UserRatingReviewValidator {
             timestamp <= 0 -> ValidationResult.Error(
                 UserRatingReviewError.UnknownError("Invalid timestamp: $timestamp")
             )
-            timestamp > System.currentTimeMillis() + 86400000 -> ValidationResult.Error(
+            timestamp > Clock.System.now().toEpochMilliseconds() + 86400000 -> ValidationResult.Error(
                 UserRatingReviewError.UnknownError("Timestamp cannot be in the future")
             )
+
             else -> ValidationResult.Success
         }
     }

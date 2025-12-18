@@ -5,6 +5,8 @@ import com.devpush.features.collections.domain.collections.CollectionType
 import com.devpush.features.collections.domain.collections.CollectionError
 import com.devpush.features.game.domain.repository.GameCollectionRepository
 import com.devpush.features.common.utils.StringUtils
+import kotlinx.datetime.Clock
+
 
 /**
  * Use case for retrieving collections with game counts, sorting, and caching
@@ -120,9 +122,10 @@ class GetCollectionsUseCaseImpl(
             
             // Update cache
             cachedCollections = sortedCollections
-            cacheTimestamp = System.currentTimeMillis()
+            cacheTimestamp = Clock.System.now().toEpochMilliseconds()
             
             Result.success(sortedCollections)
+
             
         } catch (e: Exception) {
             Result.failure(
@@ -221,6 +224,7 @@ class GetCollectionsUseCaseImpl(
      */
     private fun isCacheValid(): Boolean {
         return cachedCollections != null && 
-               (System.currentTimeMillis() - cacheTimestamp) < cacheValidityDuration
+               (Clock.System.now().toEpochMilliseconds() - cacheTimestamp) < cacheValidityDuration
     }
+
 }

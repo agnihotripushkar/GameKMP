@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalLayoutDirection
+
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.devpush.features.ui.theme.ExpressiveTokens
@@ -57,10 +59,13 @@ object ExpressiveResponsive {
     /**
      * Gets the current device type based on screen dimensions.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun getDeviceType(): DeviceType {
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
+        val density = LocalDensity.current
+        val config = LocalWindowInfo.current.containerSize
+        val screenWidth = with(density) { config.width.toDp() }
+
         
         return when {
             screenWidth < Breakpoints.Compact -> DeviceType.Phone
@@ -72,10 +77,13 @@ object ExpressiveResponsive {
     /**
      * Gets the current screen size classification.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun getScreenSize(): ScreenSize {
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
+        val density = LocalDensity.current
+        val config = LocalWindowInfo.current.containerSize
+        val screenWidth = with(density) { config.width.toDp() }
+
         
         return when {
             screenWidth < Breakpoints.Compact -> ScreenSize.Compact
@@ -87,15 +95,18 @@ object ExpressiveResponsive {
     /**
      * Gets the current orientation.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun getOrientation(): Orientation {
-        val configuration = LocalConfiguration.current
-        return if (configuration.screenWidthDp > configuration.screenHeightDp) {
+        val density = LocalDensity.current
+        val config = LocalWindowInfo.current.containerSize
+        return if (config.width > config.height) {
             Orientation.Landscape
         } else {
             Orientation.Portrait
         }
     }
+
     
     /**
      * Calculates adaptive spacing based on screen size.
@@ -366,15 +377,18 @@ object ResponsiveUtils {
     /**
      * Calculates a responsive Dp value with interpolation.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun responsiveDp(
         compactDp: Dp,
         expandedDp: Dp
     ): Dp {
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
+        val density = LocalDensity.current
+        val config = LocalWindowInfo.current.containerSize
+        val screenWidth = with(density) { config.width.toDp() }
         val compactWidth = ExpressiveResponsive.Breakpoints.Compact
         val expandedWidth = ExpressiveResponsive.Breakpoints.Expanded
+
         
         return when {
             screenWidth <= compactWidth -> compactDp
@@ -416,16 +430,19 @@ object ResponsiveUtils {
     /**
      * Calculates the optimal number of columns for a grid layout.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun optimalColumnCount(
         minItemWidth: Dp = 200.dp,
         maxColumns: Int = 4
     ): Int {
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
+        val density = LocalDensity.current
+        val config = LocalWindowInfo.current.containerSize
+        val screenWidth = with(density) { config.width.toDp() }
         val availableWidth = screenWidth - ExpressiveResponsive.adaptivePadding() * 2
         
         val calculatedColumns = (availableWidth / minItemWidth).toInt()
         return calculatedColumns.coerceIn(1, maxColumns)
     }
+
 }

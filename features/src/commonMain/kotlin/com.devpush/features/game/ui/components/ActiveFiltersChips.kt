@@ -213,7 +213,8 @@ fun ActiveFiltersChips(
                             onClick = onRemoveRating,
                             label = {
                                 Text(
-                                    text = "Rating ${String.format("%.1f", minRating)}+",
+                                    text = "Rating ${(kotlin.math.round(minRating * 10) / 10.0)}+",
+
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             },

@@ -33,6 +33,8 @@ import com.devpush.features.collections.domain.collections.CollectionType
 import com.devpush.features.collections.domain.collections.GameCollection
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
+import kotlinx.datetime.Clock
+
 
 /**
  * Confirmation dialog for deleting collections with protection for default collections
@@ -286,9 +288,10 @@ fun DeleteCollectionConfirmationDialogCustomPreview() {
             name = "My Custom Collection",
             type = CollectionType.CUSTOM,
             gameIds = listOf(1, 2, 3, 4, 5),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis(),
+            createdAt = Clock.System.now().toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds(),
             description = "A collection of my favorite indie games"
+
         ),
         onConfirm = {},
         onDismiss = {}
@@ -304,8 +307,9 @@ fun DeleteCollectionConfirmationDialogDefaultPreview() {
             name = "Wishlist",
             type = CollectionType.WISHLIST,
             gameIds = listOf(1, 2, 3),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = Clock.System.now().toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds()
+
         ),
         onConfirm = {},
         onDismiss = {}
@@ -321,8 +325,9 @@ fun DeleteCollectionConfirmationDialogEmptyPreview() {
             name = "Empty Collection",
             type = CollectionType.CUSTOM,
             gameIds = emptyList(),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = Clock.System.now().toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds()
+
         ),
         onConfirm = {},
         onDismiss = {}
@@ -338,8 +343,9 @@ fun DeleteCollectionConfirmationDialogErrorPreview() {
             name = "Test Collection",
             type = CollectionType.CUSTOM,
             gameIds = listOf(1, 2),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = Clock.System.now().toEpochMilliseconds(),
+            updatedAt = Clock.System.now().toEpochMilliseconds()
+
         ),
         onConfirm = {},
         onDismiss = {},

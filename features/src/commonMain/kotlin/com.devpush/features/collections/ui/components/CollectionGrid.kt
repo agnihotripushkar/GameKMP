@@ -32,6 +32,8 @@ import com.devpush.features.game.domain.usecase.CollectionWithCount
 import com.devpush.features.game.ui.components.CollectionCard
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.collections.domain.collections.CollectionType
+import kotlinx.datetime.Clock
+
 
 /**
  * Responsive grid layout component for displaying game collections with loading states, 
@@ -273,8 +275,9 @@ fun CollectionGridPreview() {
                 name = "Wishlist",
                 type = CollectionType.WISHLIST,
                 gameIds = listOf(1, 2, 3, 4, 5),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 5
         ),
@@ -284,8 +287,9 @@ fun CollectionGridPreview() {
                 name = "Currently Playing",
                 type = CollectionType.CURRENTLY_PLAYING,
                 gameIds = listOf(6, 7),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 2
         ),
@@ -295,8 +299,9 @@ fun CollectionGridPreview() {
                 name = "Completed",
                 type = CollectionType.COMPLETED,
                 gameIds = listOf(8, 9, 10, 11, 12, 13),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 6
         ),
@@ -306,8 +311,9 @@ fun CollectionGridPreview() {
                 name = "Indie Favorites",
                 type = CollectionType.CUSTOM,
                 gameIds = listOf(14, 15, 16),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = Clock.System.now().toEpochMilliseconds(),
+                updatedAt = Clock.System.now().toEpochMilliseconds()
+
             ),
             gameCount = 3
         )
