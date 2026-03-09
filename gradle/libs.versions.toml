@@ -13,7 +13,7 @@ androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 compose-multiplatform = "1.8.2"
 junit = "4.13.2"
-kotlin = "2.1.21"
+kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
 koin = "4.1.1"
 ktor = "3.2.3"
@@ -73,6 +73,6 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-mu
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "1.9.0" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "1.9.25" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 sql-delight={id = "app.cash.sqldelight", version.ref = "sqldelight"}
