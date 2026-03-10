@@ -43,7 +43,6 @@ import coil3.compose.AsyncImage
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.game.domain.model.collections.CollectionType
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import java.util.Locale
 
 /**
  * Enhanced GameCard component with search result highlighting support and collection actions.
@@ -183,8 +182,8 @@ private fun buildHighlightedText(text: String, searchQuery: String) = buildAnnot
         return@buildAnnotatedString
     }
     
-    val lowerText = text.lowercase(Locale.getDefault())
-    val lowerQuery = searchQuery.lowercase(Locale.getDefault())
+    val lowerText = text.lowercase()
+    val lowerQuery = searchQuery.lowercase()
     
     var startIndex = 0
     var matchIndex = lowerText.indexOf(lowerQuery, startIndex)

@@ -406,7 +406,7 @@ private fun GameSelectionItem(
                     
                     if (game.rating > 0.0) {
                         Text(
-                            text = "★ ${String.format("%.1f", game.rating)}",
+                            text = "★ ${(kotlin.math.round(game.rating * 10) / 10.0)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )

@@ -166,7 +166,7 @@ fun CollectionGameCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = String.format("%.1f", game.rating),
+                                text = "${(kotlin.math.round(game.rating * 10) / 10.0)}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.White.copy(alpha = 0.8f),
                                 fontWeight = FontWeight.Medium

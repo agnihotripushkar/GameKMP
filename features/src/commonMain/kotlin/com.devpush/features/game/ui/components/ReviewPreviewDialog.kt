@@ -33,9 +33,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.devpush.features.game.domain.model.Game
 import com.devpush.features.userRatingsReviews.domain.model.UserRating
 import com.devpush.features.userRatingsReviews.domain.model.UserReview
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * Dialog component for quickly previewing a user's review
@@ -184,8 +181,15 @@ fun ReviewPreviewDialog(
  * Formats a timestamp to a readable date string
  */
 private fun formatDate(timestamp: Long): String {
-    val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    return formatter.format(Date(timestamp))
+    val instant = kotlin.time.Instant.fromEpochMilliseconds(timestamp)
+    val epochSeconds = instant.epochSeconds
+    val days = epochSeconds / 86400
+    val year = 1970 + (days / 365.2425).toInt()
+    val dayOfYear = (days % 365.2425).toInt()
+    val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    val monthIndex = (dayOfYear / 30.44).toInt().coerceIn(0, 11)
+    val day = (dayOfYear % 30.44).toInt() + 1
+    return "${months[monthIndex]} ${day.toString().padStart(2, '0')}, $year"
 }
 
 @Preview
@@ -205,14 +209,14 @@ fun ReviewPreviewDialogPreview() {
             userRating = UserRating(
                 gameId = 1,
                 rating = 5,
-                createdAt = System.currentTimeMillis() - 86400000, // 1 day ago
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds() - 86400000, // 1 day ago
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             userReview = UserReview(
                 gameId = 1,
                 reviewText = "This game completely redefined what an open-world adventure could be. The freedom to explore, the physics-based puzzles, and the sheer beauty of Hyrule make this an unforgettable experience. Every mountain peak calls to be climbed, every shrine offers a unique challenge. A masterpiece that will be remembered for years to come.",
-                createdAt = System.currentTimeMillis() - 86400000,
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds() - 86400000,
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             )
         ),
         onDismiss = {},

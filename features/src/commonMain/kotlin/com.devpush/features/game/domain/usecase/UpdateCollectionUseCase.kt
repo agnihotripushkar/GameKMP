@@ -130,7 +130,7 @@ class UpdateCollectionUseCaseImpl(
             val updatedCollection = currentCollection.copy(
                 name = finalName,
                 description = finalDescription,
-                updatedAt = System.currentTimeMillis()
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             )
             
             // Validate the updated collection

@@ -119,7 +119,7 @@ class GetCollectionsUseCaseImpl(
             
             // Update cache
             cachedCollections = sortedCollections
-            cacheTimestamp = System.currentTimeMillis()
+            cacheTimestamp = kotlin.time.Clock.System.now().toEpochMilliseconds()
             
             Result.success(sortedCollections)
             
@@ -220,6 +220,6 @@ class GetCollectionsUseCaseImpl(
      */
     private fun isCacheValid(): Boolean {
         return cachedCollections != null && 
-               (System.currentTimeMillis() - cacheTimestamp) < cacheValidityDuration
+               (kotlin.time.Clock.System.now().toEpochMilliseconds() - cacheTimestamp) < cacheValidityDuration
     }
 }

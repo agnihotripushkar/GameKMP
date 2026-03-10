@@ -1,5 +1,6 @@
 package com.devpush.features.game.domain.model.collections
 
+
 /**
  * Domain model representing a game collection with validation methods
  * 
@@ -110,7 +111,7 @@ data class GameCollection(
      * @param newUpdatedAt The new update timestamp, defaults to current time
      * @return A new GameCollection instance with updated timestamp
      */
-    fun withUpdatedTimestamp(newUpdatedAt: Long = System.currentTimeMillis()): GameCollection {
+    fun withUpdatedTimestamp(newUpdatedAt: Long = kotlin.time.Clock.System.now().toEpochMilliseconds()): GameCollection {
         return copy(updatedAt = newUpdatedAt)
     }
     
@@ -125,7 +126,7 @@ data class GameCollection(
         } else {
             copy(
                 gameIds = gameIds + gameId,
-                updatedAt = System.currentTimeMillis()
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             )
         }
     }
@@ -138,7 +139,7 @@ data class GameCollection(
     fun withGameRemoved(gameId: Int): GameCollection {
         return copy(
             gameIds = gameIds.filter { it != gameId },
-            updatedAt = System.currentTimeMillis()
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
         )
     }
 }

@@ -62,7 +62,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
         buildConfigField("String", "API_KEY", "\"${providers.gradleProperty("API_KEY").get()}\"")
 
     }

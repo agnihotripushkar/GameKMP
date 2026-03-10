@@ -61,7 +61,7 @@ class UserRatingReviewRepositoryImpl(
                 return Result.failure(UserRatingReviewError.GameNotFound)
             }
             
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             
             // TODO: Implement database operations once SQLDelight classes are generated
             // Check if rating already exists
@@ -101,7 +101,7 @@ class UserRatingReviewRepositoryImpl(
             
             // Check cache first
             cacheMutex.withLock {
-                val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 if (cachedRatings != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return Result.success(cachedRatings!![gameId])
                 }
@@ -152,7 +152,7 @@ class UserRatingReviewRepositoryImpl(
             // Update cache
             cacheMutex.withLock {
                 cachedRatings = userRatings.associateBy { it.gameId }
-                cacheTimestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                cacheTimestamp = kotlin.time.Clock.System.now().toEpochMilliseconds()
             }
             
             Result.success(userRatings)
@@ -182,7 +182,7 @@ class UserRatingReviewRepositoryImpl(
                 return Result.failure(UserRatingReviewError.GameNotFound)
             }
             
-            val currentTime = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             
             // TODO: Implement database operations once SQLDelight classes are generated
             // Check if review already exists
@@ -253,7 +253,7 @@ class UserRatingReviewRepositoryImpl(
             // Update cache
             cacheMutex.withLock {
                 cachedReviews = userReviews.associateBy { it.gameId }
-                cacheTimestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                cacheTimestamp = kotlin.time.Clock.System.now().toEpochMilliseconds()
             }
             
             Result.success(userReviews)

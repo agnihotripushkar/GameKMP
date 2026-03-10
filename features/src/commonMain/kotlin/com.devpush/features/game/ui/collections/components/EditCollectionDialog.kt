@@ -310,8 +310,8 @@ fun EditCollectionDialogPreview() {
             name = "My Custom Collection",
             type = CollectionType.CUSTOM,
             gameIds = listOf(1, 2, 3),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis(),
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             description = "A collection of my favorite games"
         ),
         onDismiss = {},
@@ -328,8 +328,8 @@ fun EditCollectionDialogDefaultPreview() {
             name = "Wishlist",
             type = CollectionType.WISHLIST,
             gameIds = listOf(1, 2, 3, 4, 5),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
         ),
         onDismiss = {},
         onUpdateCollection = { _, _ -> }
@@ -345,8 +345,8 @@ fun EditCollectionDialogErrorPreview() {
             name = "Test Collection",
             type = CollectionType.CUSTOM,
             gameIds = emptyList(),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
         ),
         onDismiss = {},
         onUpdateCollection = { _, _ -> },

@@ -273,8 +273,8 @@ fun CollectionGridPreview() {
                 name = "Wishlist",
                 type = CollectionType.WISHLIST,
                 gameIds = listOf(1, 2, 3, 4, 5),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 5
         ),
@@ -284,8 +284,8 @@ fun CollectionGridPreview() {
                 name = "Currently Playing",
                 type = CollectionType.CURRENTLY_PLAYING,
                 gameIds = listOf(6, 7),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 2
         ),
@@ -295,8 +295,8 @@ fun CollectionGridPreview() {
                 name = "Completed",
                 type = CollectionType.COMPLETED,
                 gameIds = listOf(8, 9, 10, 11, 12, 13),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 6
         ),
@@ -306,8 +306,8 @@ fun CollectionGridPreview() {
                 name = "Indie Favorites",
                 type = CollectionType.CUSTOM,
                 gameIds = listOf(14, 15, 16),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 3
         )

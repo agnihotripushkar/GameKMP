@@ -234,7 +234,7 @@ fun CollectionGameCard(
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Text(
-                                    text = String.format("%.1f", game.rating),
+                                    text = "${(kotlin.math.round(game.rating * 10) / 10.0)}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color.White.copy(alpha = 0.7f),
                                     fontWeight = FontWeight.Normal
@@ -384,14 +384,14 @@ fun CollectionGameCardPreview() {
             userRating = UserRating(
                 gameId = 1,
                 rating = 5,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             userReview = UserReview(
                 gameId = 1,
                 reviewText = "Amazing platformer! Brings back childhood memories.",
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             )
         ),
         onClick = {},
@@ -448,8 +448,8 @@ fun CollectionGameCardUserRatingOnlyPreview() {
             userRating = UserRating(
                 gameId = 3,
                 rating = 4,
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             )
         ),
         onClick = {},

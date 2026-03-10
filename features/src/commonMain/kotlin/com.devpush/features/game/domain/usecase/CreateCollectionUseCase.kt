@@ -155,8 +155,8 @@ class CreateCollectionUseCaseImpl(
             name = name,
             type = type,
             gameIds = emptyList(),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis(),
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             description = description
         )
         

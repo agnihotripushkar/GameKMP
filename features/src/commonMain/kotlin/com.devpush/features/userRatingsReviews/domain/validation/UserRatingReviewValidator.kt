@@ -78,7 +78,7 @@ object UserRatingReviewValidator {
             timestamp <= 0 -> ValidationResult.Error(
                 UserRatingReviewError.UnknownError("Invalid timestamp: $timestamp")
             )
-            timestamp > System.currentTimeMillis() + 86400000 -> ValidationResult.Error(
+            timestamp > kotlin.time.Clock.System.now().toEpochMilliseconds() + 86400000 -> ValidationResult.Error(
                 UserRatingReviewError.UnknownError("Timestamp cannot be in the future")
             )
             else -> ValidationResult.Success

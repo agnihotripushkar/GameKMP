@@ -366,24 +366,24 @@ fun AddToCollectionDialogPreview() {
             name = "Wishlist",
             type = CollectionType.WISHLIST,
             gameIds = listOf(2, 3),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
         ),
         GameCollection(
             id = "2",
             name = "Currently Playing",
             type = CollectionType.CURRENTLY_PLAYING,
             gameIds = listOf(1), // Game is already in this collection
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
         ),
         GameCollection(
             id = "3",
             name = "Completed",
             type = CollectionType.COMPLETED,
             gameIds = listOf(4, 5, 6),
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
+            createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+            updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
         )
     )
     

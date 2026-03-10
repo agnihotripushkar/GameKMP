@@ -355,8 +355,8 @@ fun CollectionCardPreview() {
                 name = "My Wishlist",
                 type = CollectionType.WISHLIST,
                 gameIds = listOf(1, 2, 3, 4, 5),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 5
         ),
@@ -376,8 +376,8 @@ fun CollectionCardCustomPreview() {
                 name = "Indie Games Collection",
                 type = CollectionType.CUSTOM,
                 gameIds = listOf(1, 2),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 2
         ),
@@ -397,8 +397,8 @@ fun CollectionCardEmptyPreview() {
                 name = "Currently Playing",
                 type = CollectionType.CURRENTLY_PLAYING,
                 gameIds = emptyList(),
-                createdAt = System.currentTimeMillis(),
-                updatedAt = System.currentTimeMillis()
+                createdAt = kotlin.time.Clock.System.now().toEpochMilliseconds(),
+                updatedAt = kotlin.time.Clock.System.now().toEpochMilliseconds()
             ),
             gameCount = 0
         ),

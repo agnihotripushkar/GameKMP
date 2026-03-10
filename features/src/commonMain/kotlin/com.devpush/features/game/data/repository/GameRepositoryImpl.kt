@@ -49,7 +49,7 @@ class GameRepositoryImpl(
         return cacheMutex.withLock {
             try {
                 // Check if cache is still valid
-                val currentTime = System.currentTimeMillis()
+                val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 if (cachedGames != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedGames!!)
                 }
@@ -85,7 +85,7 @@ class GameRepositoryImpl(
             is OfflineResult.Success -> {
                 // Update local cache with offline data
                 cachedGames = cachedResult.data
-                cacheTimestamp = System.currentTimeMillis()
+                cacheTimestamp = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 
                 // Return success but with warning if data is stale
                 Result.success(cachedResult.data)
@@ -204,7 +204,7 @@ class GameRepositoryImpl(
         return try {
             cacheMutex.withLock {
                 // Return cached platforms if available and valid
-                val currentTime = System.currentTimeMillis()
+                val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 if (cachedPlatforms != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedPlatforms!!)
                 }
@@ -237,7 +237,7 @@ class GameRepositoryImpl(
         return try {
             cacheMutex.withLock {
                 // Return cached genres if available and valid
-                val currentTime = System.currentTimeMillis()
+                val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 if (cachedGenres != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedGenres!!)
                 }
@@ -391,7 +391,7 @@ class GameRepositoryImpl(
             Result.success(Pair(paginatedGames, hasMore))
         } catch (e: Exception) {
             val error = when {
-                e is OutOfMemoryError -> SearchFilterError.MemoryError
+                e.message?.contains("memory", ignoreCase = true) == true -> SearchFilterError.MemoryError
                 else -> SearchFilterError.UnknownError(e.message ?: "Pagination failed", e)
             }
             Result.failure(error)

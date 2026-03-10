@@ -3,7 +3,6 @@ package com.devpush.features.game.domain.usecase
 import com.devpush.features.game.domain.model.collections.CollectionFilterState
 import com.devpush.features.game.domain.model.collections.CollectionSortOption
 import com.devpush.features.userRatingsReviews.domain.model.GameWithUserData
-import java.util.Locale
 
 /**
  * Use case for filtering and sorting games in collections with user rating support
@@ -36,8 +35,8 @@ class FilterCollectionGamesUseCase {
         
         // Search query filter
         if (filterState.hasActiveSearch()) {
-            val query = filterState.searchQuery.lowercase(Locale.getDefault())
-            val gameName = game.name.lowercase(Locale.getDefault())
+            val query = filterState.searchQuery.lowercase()
+            val gameName = game.name.lowercase()
             if (!gameName.contains(query)) {
                 return false
             }

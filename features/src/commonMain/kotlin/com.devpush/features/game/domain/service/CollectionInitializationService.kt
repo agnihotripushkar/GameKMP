@@ -58,7 +58,7 @@ class CollectionInitializationServiceImpl(
     override suspend fun initializeOnAppStart(): Result<InitializationResult> {
         return initializationMutex.withLock {
             try {
-                val startTime = System.currentTimeMillis()
+                val startTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 
                 // Check if already initialized
                 if (isInitializedFlag) {
@@ -66,7 +66,7 @@ class CollectionInitializationServiceImpl(
                         InitializationResult(
                             defaultCollectionsCreated = emptyList(),
                             wasAlreadyInitialized = true,
-                            initializationTimeMs = System.currentTimeMillis() - startTime
+                            initializationTimeMs = kotlin.time.Clock.System.now().toEpochMilliseconds() - startTime
                         )
                     )
                 }
@@ -96,7 +96,7 @@ class CollectionInitializationServiceImpl(
                 // Mark as initialized
                 isInitializedFlag = true
                 
-                val endTime = System.currentTimeMillis()
+                val endTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 val result = InitializationResult(
                     defaultCollectionsCreated = createdCollections,
                     wasAlreadyInitialized = alreadyInitialized,

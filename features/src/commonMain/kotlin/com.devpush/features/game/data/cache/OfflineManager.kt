@@ -7,8 +7,6 @@ import com.devpush.features.game.domain.model.SearchFilterError
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 
 /**
  * Manages offline functionality and cached data for the game search and filter feature.
@@ -23,12 +21,12 @@ class OfflineManager {
     private val _cachedPlatforms = MutableStateFlow<List<Platform>>(emptyList())
     private val _cachedGenres = MutableStateFlow<List<Genre>>(emptyList())
     
-    private var lastUpdateTime: Instant? = null
+    private var lastUpdateTime: Long? = null
     private val maxCacheAge = 24 * 60 * 60 * 1000L // 24 hours in milliseconds
-    
+
     // Cache metadata
     private data class CacheMetadata(
-        val timestamp: Instant,
+        val timestamp: Long,
         val version: Int = 1,
         val source: String = "api"
     )
@@ -50,10 +48,10 @@ class OfflineManager {
     fun cacheGames(games: List<Game>) {
         _cachedGames.value = games
         gamesMetadata = CacheMetadata(
-            timestamp = Clock.System.now(),
+            timestamp = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             source = if (_isOnline.value) "api" else "offline"
         )
-        lastUpdateTime = Clock.System.now()
+        lastUpdateTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
     }
     
     /**
@@ -62,7 +60,7 @@ class OfflineManager {
     fun cachePlatforms(platforms: List<Platform>) {
         _cachedPlatforms.value = platforms
         platformsMetadata = CacheMetadata(
-            timestamp = Clock.System.now(),
+            timestamp = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             source = if (_isOnline.value) "api" else "offline"
         )
     }
@@ -73,7 +71,7 @@ class OfflineManager {
     fun cacheGenres(genres: List<Genre>) {
         _cachedGenres.value = genres
         genresMetadata = CacheMetadata(
-            timestamp = Clock.System.now(),
+            timestamp = kotlin.time.Clock.System.now().toEpochMilliseconds(),
             source = if (_isOnline.value) "api" else "offline"
         )
     }
@@ -162,20 +160,19 @@ class OfflineManager {
     /**
      * Checks if cached data is still fresh
      */
-    private fun isDataFresh(timestamp: Instant): Boolean {
-        val now = Clock.System.now()
-        val ageMillis = (now - timestamp).inWholeMilliseconds
+    private fun isDataFresh(timestamp: Long): Boolean {
+        val ageMillis = kotlin.time.Clock.System.now().toEpochMilliseconds() - timestamp
         return ageMillis < maxCacheAge
     }
-    
+
     /**
      * Gets cache status information
      */
     fun getCacheStatus(): CacheStatus {
-        val now = Clock.System.now()
-        val gamesAge = gamesMetadata?.let { (now - it.timestamp).inWholeMilliseconds }
-        val platformsAge = platformsMetadata?.let { (now - it.timestamp).inWholeMilliseconds }
-        val genresAge = genresMetadata?.let { (now - it.timestamp).inWholeMilliseconds }
+        val now = kotlin.time.Clock.System.now().toEpochMilliseconds()
+        val gamesAge = gamesMetadata?.let { now - it.timestamp }
+        val platformsAge = platformsMetadata?.let { now - it.timestamp }
+        val genresAge = genresMetadata?.let { now - it.timestamp }
         
         return CacheStatus(
             isOnline = _isOnline.value,

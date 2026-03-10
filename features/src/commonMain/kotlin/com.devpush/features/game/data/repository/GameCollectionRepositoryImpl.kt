@@ -67,7 +67,7 @@ class GameCollectionRepositoryImpl(
             }
             
             // Create new collection
-            val currentTime = System.currentTimeMillis()
+            val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             val collection = GameCollection(
                 id = Uuid.random().toString(),
                 name = name,
@@ -119,7 +119,7 @@ class GameCollectionRepositoryImpl(
         return try {
             cacheMutex.withLock {
                 // Check cache validity
-                val currentTime = System.currentTimeMillis()
+                val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 if (cachedCollections != null && (currentTime - cacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedCollections!!)
                 }
@@ -192,7 +192,7 @@ class GameCollectionRepositoryImpl(
             }
             
             // Add game to collection
-            val currentTime = System.currentTimeMillis()
+            val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             appDatabase.appDatabaseQueries.addGameToCollection(collectionId, gameId.toLong(), currentTime)
             
             // Update collection timestamp
@@ -237,7 +237,7 @@ class GameCollectionRepositoryImpl(
             appDatabase.appDatabaseQueries.removeGameFromCollection(collectionId, gameId.toLong())
             
             // Update collection timestamp
-            val currentTime = System.currentTimeMillis()
+            val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             appDatabase.appDatabaseQueries.updateCollection(
                 collectionExists.name,
                 collectionExists.description,
@@ -455,7 +455,7 @@ class GameCollectionRepositoryImpl(
         return try {
             cacheMutex.withLock {
                 // Check cache validity
-                val currentTime = System.currentTimeMillis()
+                val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
                 if (cachedGameCounts != null && (currentTime - gameCountsCacheTimestamp) < cacheValidityDuration) {
                     return@withLock Result.success(cachedGameCounts!!)
                 }
@@ -514,7 +514,7 @@ class GameCollectionRepositoryImpl(
             appDatabase.appDatabaseQueries.removeAllGamesFromCollection(collectionId)
             
             // Update collection timestamp
-            val currentTime = System.currentTimeMillis()
+            val currentTime = kotlin.time.Clock.System.now().toEpochMilliseconds()
             appDatabase.appDatabaseQueries.updateCollection(
                 collection.name,
                 collection.description,
