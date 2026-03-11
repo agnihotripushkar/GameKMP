@@ -84,6 +84,8 @@ kotlin {
             implementation(libs.navigation.compose)
 
             implementation(libs.napier)
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.no.arg)
         }
 
         iosMain.dependencies {

@@ -14,10 +14,18 @@ import com.devpush.features.game.ui.collections.CollectionDetailScreen
 import com.devpush.features.userRatingsReviews.ui.statistics.StatisticsScreen
 import kotlinx.serialization.Serializable
 
+import com.russhwolf.settings.Settings
+
 object GameNavGraph : BaseNavGraph {
 
     @Serializable
     sealed class Dest {
+
+        @Serializable
+        data object Splash : Dest()
+
+        @Serializable
+        data object Onboarding : Dest()
 
         @Serializable
         data object Root : Dest()
@@ -43,7 +51,33 @@ object GameNavGraph : BaseNavGraph {
         navHostController: NavHostController,
         navGraphBuilder: NavGraphBuilder
     ) {
-        navGraphBuilder.navigation<Dest.Root>(startDestination = Dest.Game) {
+        val settings = Settings()
+
+        navGraphBuilder.navigation<Dest.Root>(startDestination = Dest.Splash) {
+            composable<Dest.Splash> {
+                com.devpush.kmp.ui.onboarding.SplashScreen {
+                    val hasSeenOnboarding = settings.getBoolean("has_seen_onboarding", false)
+                    if (hasSeenOnboarding) {
+                        navHostController.navigate(Dest.Game) {
+                            popUpTo(Dest.Splash) { inclusive = true }
+                        }
+                    } else {
+                        navHostController.navigate(Dest.Onboarding) {
+                            popUpTo(Dest.Splash) { inclusive = true }
+                        }
+                    }
+                }
+            }
+
+            composable<Dest.Onboarding> {
+                com.devpush.kmp.ui.onboarding.OnboardingScreen {
+                    settings.putBoolean("has_seen_onboarding", true)
+                    navHostController.navigate(Dest.Game) {
+                        popUpTo(Dest.Onboarding) { inclusive = true }
+                    }
+                }
+            }
+
             composable<Dest.Game> {
                 GameScreen(
                     modifier = modifier.fillMaxSize(),

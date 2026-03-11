@@ -26,6 +26,7 @@ lifecycleViewmodelCompose = "2.9.1"
 navigation-compose = "2.9.2"
 coil3 = "3.4.0"
 napier = "2.7.1"
+multiplatform-settings = "1.1.1"
 
 
 [libraries]
@@ -69,6 +70,8 @@ sql-delight-android = { module = "app.cash.sqldelight:android-driver", version.r
 sql-delight-ios = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
